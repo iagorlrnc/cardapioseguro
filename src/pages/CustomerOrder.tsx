@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   ShoppingCart,
   LogOut,
@@ -18,86 +18,86 @@ import {
   ChevronDown,
   Share2,
   Bell,
-} from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
-import { supabase, MenuItem, CartItem, Order } from "../lib/supabase";
-import { UserQRCodeDisplay } from "../components/UserQRCodeDisplay";
+} from "lucide-react"
+import { useAuth } from "../contexts/AuthContext"
+import { supabase, MenuItem, CartItem, Order } from "../lib/supabase"
+import { UserQRCodeDisplay } from "../components/UserQRCodeDisplay"
 
 const formatOrderNumericId = (id: string) => {
   // deterministic hash to 3-digit numeric id (100-999)
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < id.length; i++) {
-    hash = (hash * 31 + id.charCodeAt(i)) % 1000;
+    hash = (hash * 31 + id.charCodeAt(i)) % 1000
   }
-  if (hash < 100) hash += 100;
-  return String(hash).padStart(3, "0");
-};
+  if (hash < 100) hash += 100
+  return String(hash).padStart(3, "0")
+}
 
 export default function CustomerOrder() {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [showCart, setShowCart] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
-  const [userOrders, setUserOrders] = useState<Order[]>([]);
-  const [viewingOrderId, setViewingOrderId] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [toastMessage, setToastMessage] = useState<string>("");
-  const [showToast, setShowToast] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"menu" | "orders">("menu");
-  const [showItemDetails, setShowItemDetails] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
-  const [observations, setObservations] = useState<string>("");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [skipAutoSelectOrder, setSkipAutoSelectOrder] = useState(true);
-  const [currentOrderItems, setCurrentOrderItems] = useState<any[]>([]);
-  const [showUserQRCode, setShowUserQRCode] = useState(false);
-  const [callingWaiter, setCallingWaiter] = useState(false);
-  const [lastWaiterCall, setLastWaiterCall] = useState<number | null>(null);
-  const toastTimeoutRef = useRef<number | null>(null);
-  const filterRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [showCart, setShowCart] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null)
+  const [userOrders, setUserOrders] = useState<Order[]>([])
+  const [viewingOrderId, setViewingOrderId] = useState<string | null>(null)
+  const [categories, setCategories] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState<string>("")
+  const [toastMessage, setToastMessage] = useState<string>("")
+  const [showToast, setShowToast] = useState<boolean>(false)
+  const [activeTab, setActiveTab] = useState<"menu" | "orders">("menu")
+  const [showItemDetails, setShowItemDetails] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<string>("")
+  const [observations, setObservations] = useState<string>("")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [showWelcome, setShowWelcome] = useState(false)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [skipAutoSelectOrder, setSkipAutoSelectOrder] = useState(true)
+  const [currentOrderItems, setCurrentOrderItems] = useState<any[]>([])
+  const [showUserQRCode, setShowUserQRCode] = useState(false)
+  const [callingWaiter, setCallingWaiter] = useState(false)
+  const [lastWaiterCall, setLastWaiterCall] = useState<number | null>(null)
+  const toastTimeoutRef = useRef<number | null>(null)
+  const filterRef = useRef<HTMLDivElement>(null)
 
   const fetchMenuItems = useCallback(async () => {
     const { data } = await supabase
       .from("menu_items")
       .select("*")
       .eq("active", true)
-      .order("name");
+      .order("name")
 
     if (data) {
-      setMenuItems(data);
-      const allCategories = [...new Set(data.map((item) => item.category))];
+      setMenuItems(data)
+      const allCategories = [...new Set(data.map((item) => item.category))]
 
       // Carregar ordem das categorias do banco de dados
       const { data: categoryOrderData } = await supabase
         .from("category_order")
         .select("category, position")
-        .order("position", { ascending: true });
+        .order("position", { ascending: true })
 
       if (categoryOrderData && categoryOrderData.length > 0) {
         // Usar ordem do banco de dados
         const orderedCats = categoryOrderData
           .map((item) => item.category)
-          .filter((cat) => allCategories.includes(cat));
+          .filter((cat) => allCategories.includes(cat))
 
         // Adicionar categorias novas que não estão no banco
         const newCats = allCategories.filter(
           (cat) => !orderedCats.includes(cat),
-        );
-        setCategories(["todos", ...orderedCats, ...newCats]);
+        )
+        setCategories(["todos", ...orderedCats, ...newCats])
       } else {
         // Sem ordem salva, usar ordem padrão
-        setCategories(["todos", ...allCategories]);
+        setCategories(["todos", ...allCategories])
       }
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -105,49 +105,49 @@ export default function CustomerOrder() {
         filterRef.current &&
         !filterRef.current.contains(event.target as Node)
       ) {
-        setIsFilterOpen(false);
+        setIsFilterOpen(false)
       }
-    };
+    }
 
     if (isFilterOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside)
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isFilterOpen]);
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [isFilterOpen])
 
   const handleCategorySelect = (category: string) => {
     if (category === "Todos") {
-      setSelectedCategories([]);
+      setSelectedCategories([])
     } else {
       setSelectedCategories((prev) => {
         const newSelection = prev.includes(category)
           ? prev.filter((c) => c !== category)
-          : [...prev, category];
+          : [...prev, category]
 
         // Verifica se todas as categorias (exceto "todos") foram selecionadas
         const allCategoriesExceptTodos = categories.filter(
           (cat) => cat !== "todos",
-        );
+        )
         const allSelected = allCategoriesExceptTodos.every((cat) =>
           newSelection.includes(cat),
-        );
+        )
 
         // Se todas foram selecionadas, marca como "Todos" (array vazia)
-        return allSelected ? [] : newSelection;
-      });
+        return allSelected ? [] : newSelection
+      })
     }
-    setIsFilterOpen(false);
-  };
+    setIsFilterOpen(false)
+  }
 
   const removeCategory = (category: string) => {
-    setSelectedCategories((prev) => prev.filter((c) => c !== category));
-  };
+    setSelectedCategories((prev) => prev.filter((c) => c !== category))
+  }
 
   const checkExistingOrder = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) return
 
     const { data } = await supabase
       .from("orders")
@@ -155,110 +155,123 @@ export default function CustomerOrder() {
       .eq("user_id", user.id)
       .eq("hidden", false)
       .in("status", ["pending", "preparing", "ready", "completed", "cancelled"])
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
 
     if (data && data.length > 0) {
       // Buscar dados dos funcionários atribuídos
       const { data: usersData } = await supabase
         .from("users")
-        .select("id, username");
+        .select("id, username")
 
       // Adicionar informações do funcionário a cada pedido
       const ordersWithEmployee = data.map((order) => {
         const assignedEmployee = usersData?.find(
           (u) => u.id === order.assigned_to,
-        );
+        )
         return {
           ...order,
           assigned_employee: assignedEmployee
             ? { username: assignedEmployee.username }
             : null,
-        };
-      });
+        }
+      })
 
-      setUserOrders(ordersWithEmployee);
+      setUserOrders(ordersWithEmployee)
       // Se há apenas um pedido e não estamos fazendo novo pedido, mantém sempre no painel de status
       if (ordersWithEmployee.length === 1 && !skipAutoSelectOrder) {
-        setCurrentOrder(ordersWithEmployee[0]);
-        setViewingOrderId(ordersWithEmployee[0].id);
-        setActiveTab("orders");
+        setCurrentOrder(ordersWithEmployee[0])
+        setViewingOrderId(ordersWithEmployee[0].id)
+        setActiveTab("orders")
       } else if (isInitialLoad && !viewingOrderId && !skipAutoSelectOrder) {
         // Se há múltiplos pedidos e é a primeira carga, mostra o mais recente
-        setCurrentOrder(ordersWithEmployee[0]);
-        setViewingOrderId(ordersWithEmployee[0].id);
-        setActiveTab("orders");
-        setIsInitialLoad(false);
+        setCurrentOrder(ordersWithEmployee[0])
+        setViewingOrderId(ordersWithEmployee[0].id)
+        setActiveTab("orders")
+        setIsInitialLoad(false)
       } else if (viewingOrderId) {
         // Se já está visualizando um pedido específico, mantém ele atualizado
         const viewingOrder = ordersWithEmployee.find(
           (order) => order.id === viewingOrderId,
-        );
+        )
         if (viewingOrder) {
-          setCurrentOrder(viewingOrder);
+          setCurrentOrder(viewingOrder)
         }
       }
       // Quando há múltiplos pedidos e não é a primeira carga, não muda de aba
       if (ordersWithEmployee.length > 1) {
-        setIsInitialLoad(false);
+        setIsInitialLoad(false)
       }
     } else {
-      setUserOrders([]);
-      setCurrentOrder(null);
-      setViewingOrderId(null);
-      setActiveTab("menu");
-      setIsInitialLoad(false);
+      setUserOrders([])
+      setCurrentOrder(null)
+      setViewingOrderId(null)
+      setActiveTab("menu")
+      setIsInitialLoad(false)
     }
-  }, [user?.id, viewingOrderId, isInitialLoad, skipAutoSelectOrder]);
+  }, [user?.id, viewingOrderId, isInitialLoad, skipAutoSelectOrder])
 
   const fetchOrderStatus = useCallback(async () => {
-    if (!currentOrder) return;
+    if (!currentOrder) return
 
     const { data } = await supabase
       .from("orders")
       .select("*")
       .eq("id", currentOrder.id)
-      .single();
+      .single()
 
     if (data && !data.hidden) {
       // Buscar dados do funcionário atribuído
-      let assignedEmployee = null;
+      let assignedEmployee = null
       if (data.assigned_to) {
         const { data: userData } = await supabase
           .from("users")
           .select("id, username")
           .eq("id", data.assigned_to)
-          .single();
-        assignedEmployee = userData ? { username: userData.username } : null;
+          .single()
+        assignedEmployee = userData ? { username: userData.username } : null
       }
 
       // Buscar itens do pedido
       const { data: itemsData } = await supabase
         .from("order_items")
         .select("*, menu_items(*)")
-        .eq("order_id", data.id);
+        .eq("order_id", data.id)
 
       const orderWithEmployee = {
         ...data,
         assigned_employee: assignedEmployee,
-      };
+      }
 
-      setCurrentOrderItems(itemsData || []);
+      setCurrentOrderItems(itemsData || [])
       setUserOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.id === data.id ? orderWithEmployee : order,
         ),
-      );
-      setCurrentOrder(orderWithEmployee);
+      )
+      setCurrentOrder(orderWithEmployee)
     } else {
       // Pedido foi ocultado ou não existe mais, verificar se há outros pedidos
-      checkExistingOrder();
+      checkExistingOrder()
     }
-  }, [currentOrder, checkExistingOrder]);
+  }, [currentOrder, checkExistingOrder])
 
   useEffect(() => {
-    fetchMenuItems();
-    checkExistingOrder();
-  }, [checkExistingOrder, fetchMenuItems]);
+    // Verificar se deve mostrar tela de boas-vindas
+    if (user?.id) {
+      const welcomeShownKey = `welcome_shown_${user.id}`
+      const hasShownWelcome = localStorage.getItem(welcomeShownKey)
+
+      if (!hasShownWelcome) {
+        setShowWelcome(true)
+        localStorage.setItem(welcomeShownKey, "true")
+      }
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    fetchMenuItems()
+    checkExistingOrder()
+  }, [checkExistingOrder, fetchMenuItems])
 
   useEffect(() => {
     const channel = supabase
@@ -267,54 +280,54 @@ export default function CustomerOrder() {
         "postgres_changes",
         { event: "*", schema: "public", table: "menu_items" },
         () => {
-          fetchMenuItems();
+          fetchMenuItems()
         },
       )
-      .subscribe();
+      .subscribe()
 
     return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [fetchMenuItems]);
+      supabase.removeChannel(channel)
+    }
+  }, [fetchMenuItems])
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchMenuItems();
-    }, 2000);
+      fetchMenuItems()
+    }, 2000)
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        fetchMenuItems();
+        fetchMenuItems()
       }
-    };
+    }
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () => {
-      clearInterval(interval);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [fetchMenuItems]);
+      clearInterval(interval)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [fetchMenuItems])
 
   useEffect(() => {
     if (currentOrder) {
       const interval = setInterval(() => {
-        fetchOrderStatus();
-      }, 2000); // Verificar status a cada 2 segundos
+        fetchOrderStatus()
+      }, 2000) // Verificar status a cada 2 segundos
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval)
     }
-  }, [currentOrder, fetchOrderStatus]);
+  }, [currentOrder, fetchOrderStatus])
 
   useEffect(() => {
     if (activeTab === "orders") {
       const interval = setInterval(() => {
-        checkExistingOrder();
-      }, 2000); // Atualizar histórico de pedidos a cada 2 segundos
+        checkExistingOrder()
+      }, 2000) // Atualizar histórico de pedidos a cada 2 segundos
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval)
     }
-  }, [activeTab, checkExistingOrder]);
+  }, [activeTab, checkExistingOrder])
 
   useEffect(() => {
     if (viewingOrderId && activeTab === "orders") {
@@ -322,44 +335,44 @@ export default function CustomerOrder() {
         const { data: itemsData } = await supabase
           .from("order_items")
           .select("*, menu_items(*)")
-          .eq("order_id", viewingOrderId);
+          .eq("order_id", viewingOrderId)
 
-        setCurrentOrderItems(itemsData || []);
-      };
+        setCurrentOrderItems(itemsData || [])
+      }
 
-      fetchOrderItems();
+      fetchOrderItems()
     }
-  }, [viewingOrderId, activeTab]);
+  }, [viewingOrderId, activeTab])
 
   const addToCart = (item: MenuItem) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id)
       if (existingItem) {
         return prevCart.map((cartItem) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem,
-        );
+        )
       }
-      return [...prevCart, { ...item, quantity: 1 }];
-    });
+      return [...prevCart, { ...item, quantity: 1 }]
+    })
 
     // Mostrar toast de confirmação
     if (toastTimeoutRef.current) {
-      clearTimeout(toastTimeoutRef.current);
+      clearTimeout(toastTimeoutRef.current)
     }
-    setToastMessage(`${item.name} adicionado ao carrinho`);
-    setShowToast(true);
+    setToastMessage(`${item.name} adicionado ao carrinho`)
+    setShowToast(true)
     toastTimeoutRef.current = window.setTimeout(() => {
-      setShowToast(false);
-      toastTimeoutRef.current = null;
-    }, 2500);
-  };
+      setShowToast(false)
+      toastTimeoutRef.current = null
+    }, 2500)
+  }
 
   const openItemDetails = (item: MenuItem) => {
-    setSelectedItem(item);
-    setShowItemDetails(true);
-  };
+    setSelectedItem(item)
+    setShowItemDetails(true)
+  }
 
   const cancelOrder = async (orderId: string) => {
     if (confirm("Deseja realmente cancelar este pedido?")) {
@@ -367,29 +380,29 @@ export default function CustomerOrder() {
         await supabase
           .from("orders")
           .update({ status: "cancelled" })
-          .eq("id", orderId);
+          .eq("id", orderId)
 
-        setToastMessage("Pedido cancelado com sucesso");
-        setShowToast(true);
+        setToastMessage("Pedido cancelado com sucesso")
+        setShowToast(true)
         toastTimeoutRef.current = window.setTimeout(() => {
-          setShowToast(false);
-          toastTimeoutRef.current = null;
-        }, 2500);
+          setShowToast(false)
+          toastTimeoutRef.current = null
+        }, 2500)
 
         // Atualizar o pedido localmente
         setCurrentOrder((prev) =>
           prev ? { ...prev, status: "cancelled" } : null,
-        );
+        )
       } catch (error) {
-        setToastMessage("Erro ao cancelar pedido");
-        setShowToast(true);
+        setToastMessage("Erro ao cancelar pedido")
+        setShowToast(true)
         toastTimeoutRef.current = window.setTimeout(() => {
-          setShowToast(false);
-          toastTimeoutRef.current = null;
-        }, 2500);
+          setShowToast(false)
+          toastTimeoutRef.current = null
+        }, 2500)
       }
     }
-  };
+  }
 
   const updateQuantity = (id: string, delta: number) => {
     setCart((prevCart) => {
@@ -397,68 +410,68 @@ export default function CustomerOrder() {
         .map((item) =>
           item.id === id ? { ...item, quantity: item.quantity + delta } : item,
         )
-        .filter((item) => item.quantity > 0);
-    });
-  };
+        .filter((item) => item.quantity > 0)
+    })
+  }
 
   const removeFromCart = (id: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
-  };
+    setCart((prevCart) => prevCart.filter((item) => item.id !== id))
+  }
 
   const getTotal = () => {
-    return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  };
+    return cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  }
 
   const handleNewOrder = () => {
-    setCurrentOrder(null);
-    setViewingOrderId(null);
-    setSkipAutoSelectOrder(true);
-    setActiveTab("menu");
-  };
+    setCurrentOrder(null)
+    setViewingOrderId(null)
+    setSkipAutoSelectOrder(true)
+    setActiveTab("menu")
+  }
 
   const handleViewOrder = (order: Order) => {
-    setCurrentOrder(order);
-    setViewingOrderId(order.id);
-    setActiveTab("orders");
-  };
+    setCurrentOrder(order)
+    setViewingOrderId(order.id)
+    setActiveTab("orders")
+  }
 
   const handleViewOrders = () => {
-    setSkipAutoSelectOrder(false);
-    setActiveTab("orders");
+    setSkipAutoSelectOrder(false)
+    setActiveTab("orders")
     // Se há apenas um pedido, seleciona ele automaticamente
     if (userOrders.length === 1) {
-      setCurrentOrder(userOrders[0]);
-      setViewingOrderId(userOrders[0].id);
+      setCurrentOrder(userOrders[0])
+      setViewingOrderId(userOrders[0].id)
     } else if (userOrders.length > 0 && !currentOrder) {
       // Se há múltiplos e nenhum selecionado, seleciona o primeiro
-      setCurrentOrder(userOrders[0]);
-      setViewingOrderId(userOrders[0].id);
+      setCurrentOrder(userOrders[0])
+      setViewingOrderId(userOrders[0].id)
     }
-  };
+  }
 
   const handleCallWaiter = async () => {
     // Evitar chamadas repetidas em menos de 30 segundos
     if (lastWaiterCall && Date.now() - lastWaiterCall < 30000) {
-      setToastMessage("Aguarde um pouco antes de chamar novamente.");
-      setShowToast(true);
+      setToastMessage("Aguarde um pouco antes de chamar novamente.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 2500);
-      return;
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 2500)
+      return
     }
 
     if (!user?.id) {
-      setToastMessage("Erro: usuário não identificado.");
-      setShowToast(true);
+      setToastMessage("Erro: usuário não identificado.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 2500);
-      return;
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 2500)
+      return
     }
 
-    setCallingWaiter(true);
+    setCallingWaiter(true)
 
     try {
       // Primeiro, deletar chamadas pendentes antigas desta mesa
@@ -466,7 +479,7 @@ export default function CustomerOrder() {
         .from("waiter_calls")
         .delete()
         .eq("user_id", user.id)
-        .eq("status", "pending");
+        .eq("status", "pending")
 
       // Inserir nova chamada
       const { error } = await supabase.from("waiter_calls").insert({
@@ -474,67 +487,67 @@ export default function CustomerOrder() {
         table_name: user.username,
         status: "pending",
         created_at: new Date().toISOString(),
-      });
+      })
 
       if (error) {
-        throw error;
+        throw error
       }
 
-      setLastWaiterCall(Date.now());
-      setToastMessage("Garçom solicitado! Aguarde a chegada.");
-      setShowToast(true);
+      setLastWaiterCall(Date.now())
+      setToastMessage("Garçom solicitado! Aguarde a chegada.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 2500);
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 2500)
     } catch (error) {
-      setToastMessage("Erro ao solicitar garçom. Tente novamente.");
-      setShowToast(true);
+      setToastMessage("Erro ao solicitar garçom. Tente novamente.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 2500);
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 2500)
     } finally {
-      setCallingWaiter(false);
+      setCallingWaiter(false)
     }
-  };
+  }
 
   const handleFinishOrder = async () => {
     // Verificações de validação
     if (!user?.id) {
-      setToastMessage("Você precisa estar logado para fazer um pedido.");
-      setShowToast(true);
+      setToastMessage("Você precisa estar logado para fazer um pedido.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 3000);
-      return;
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 3000)
+      return
     }
 
     if (cart.length === 0) {
-      setToastMessage("Adicione pelo menos um item ao carrinho.");
-      setShowToast(true);
+      setToastMessage("Adicione pelo menos um item ao carrinho.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 3000);
-      return;
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 3000)
+      return
     }
 
     if (!paymentMethod) {
-      setToastMessage("Selecione a forma de pagamento.");
-      setShowToast(true);
+      setToastMessage("Selecione a forma de pagamento.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 3000);
-      return;
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 3000)
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
 
     try {
-      const total = getTotal();
+      const total = getTotal()
 
       // Preparar dados do pedido com todos os campos
       const basicOrderData = {
@@ -543,18 +556,18 @@ export default function CustomerOrder() {
         total,
         payment_method: paymentMethod || null,
         observations: observations || null,
-      };
+      }
 
       const { data: insertedOrder, error: orderError } = await supabase
         .from("orders")
         .insert(basicOrderData)
         .select()
-        .single();
+        .single()
 
       if (orderError || !insertedOrder) {
         throw new Error(
           `Erro ao criar pedido: ${orderError?.message || "Erro desconhecido"}`,
-        );
+        )
       }
 
       // Inserir os itens do pedido
@@ -563,46 +576,46 @@ export default function CustomerOrder() {
         menu_item_id: item.id,
         quantity: item.quantity,
         price: item.price,
-      }));
+      }))
 
       const { error: itemsError } = await supabase
         .from("order_items")
-        .insert(orderItems);
+        .insert(orderItems)
 
       if (itemsError) {
         throw new Error(
           `Erro ao adicionar itens ao pedido: ${itemsError.message}`,
-        );
+        )
       }
 
-      setToastMessage("Pedido realizado com sucesso!");
-      setShowToast(true);
+      setToastMessage("Pedido realizado com sucesso!")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 3000);
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 3000)
 
-      setCart([]);
-      setPaymentMethod("");
-      setObservations("");
+      setCart([])
+      setPaymentMethod("")
+      setObservations("")
 
       // Adiciona o novo pedido à lista e define como atual
-      setUserOrders((prevOrders) => [insertedOrder, ...prevOrders]);
-      setCurrentOrder(insertedOrder);
-      setViewingOrderId(insertedOrder.id);
-      setActiveTab("orders");
-      setShowCart(false);
+      setUserOrders((prevOrders) => [insertedOrder, ...prevOrders])
+      setCurrentOrder(insertedOrder)
+      setViewingOrderId(insertedOrder.id)
+      setActiveTab("orders")
+      setShowCart(false)
     } catch (error) {
-      setToastMessage("Erro ao finalizar pedido. Tente novamente.");
-      setShowToast(true);
+      setToastMessage("Erro ao finalizar pedido. Tente novamente.")
+      setShowToast(true)
       toastTimeoutRef.current = window.setTimeout(() => {
-        setShowToast(false);
-        toastTimeoutRef.current = null;
-      }, 3000);
+        setShowToast(false)
+        toastTimeoutRef.current = null
+      }, 3000)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -686,8 +699,8 @@ export default function CustomerOrder() {
                 </button>
                 <button
                   onClick={() => {
-                    logout();
-                    navigate("/");
+                    logout()
+                    navigate("/")
                   }}
                   className="p-2 sm:p-2.5 md:p-3 hover:bg-gray-100 rounded-lg transition duration-200"
                   title="Sair"
@@ -914,19 +927,19 @@ export default function CustomerOrder() {
                         item.description
                           .toLowerCase()
                           .includes(searchQuery.toLowerCase())),
-                  );
+                  )
 
                   // Group items by category
                   const groupedItems = filteredItems.reduce(
                     (acc, item) => {
                       if (!acc[item.category]) {
-                        acc[item.category] = [];
+                        acc[item.category] = []
                       }
-                      acc[item.category].push(item);
-                      return acc;
+                      acc[item.category].push(item)
+                      return acc
                     },
                     {} as Record<string, MenuItem[]>,
-                  );
+                  )
 
                   // Renderizar categorias na ordem salva no banco de dados
                   const orderedCategoryKeys = categories
@@ -935,14 +948,14 @@ export default function CustomerOrder() {
                       Object.keys(groupedItems).filter(
                         (cat) => !categories.includes(cat),
                       ),
-                    );
+                    )
 
                   return orderedCategoryKeys.map((category) => {
                     const items = [...groupedItems[category]].sort((a, b) =>
                       a.name.localeCompare(b.name, "pt-BR", {
                         sensitivity: "base",
                       }),
-                    );
+                    )
                     return (
                       <div key={category} className="mb-6 sm:mb-8">
                         <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2">
@@ -988,8 +1001,8 @@ export default function CustomerOrder() {
                           ))}
                         </div>
                       </div>
-                    );
-                  });
+                    )
+                  })
                 })()}
               </div>
             </div>
@@ -1421,8 +1434,8 @@ export default function CustomerOrder() {
                     </span>
                     <button
                       onClick={() => {
-                        addToCart(selectedItem);
-                        setShowItemDetails(false);
+                        addToCart(selectedItem)
+                        setShowItemDetails(false)
                       }}
                       className="w-full xs:w-auto bg-black text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-gray-800 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
                     >
@@ -1453,5 +1466,5 @@ export default function CustomerOrder() {
         )}
       </div>
     </>
-  );
+  )
 }

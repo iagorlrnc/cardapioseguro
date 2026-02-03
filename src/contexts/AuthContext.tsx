@@ -308,6 +308,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(logoutTimer)
       setLogoutTimer(null)
     }
+    // Limpar flag de boas-vindas para que apareça novamente no próximo login
+    if (user?.id) {
+      localStorage.removeItem(`welcome_shown_${user.id}`)
+    }
     // A sessão ativa NÃO é removida no logout do cliente
     // A mesa permanece marcada como "em uso" até que o funcionário a libere explicitamente
     setUser(null)
