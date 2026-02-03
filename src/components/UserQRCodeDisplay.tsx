@@ -1,11 +1,11 @@
-import { QRCodeSVG } from "qrcode.react";
-import { X, Share2, Copy } from "lucide-react";
-import { useRef, useState } from "react";
+import { QRCodeSVG } from "qrcode.react"
+import { X, Share2, Copy } from "lucide-react"
+import { useRef, useState } from "react"
 
 interface UserQRCodeDisplayProps {
-  username: string;
-  userSlug: string;
-  onClose: () => void;
+  username: string
+  userSlug: string
+  onClose: () => void
 }
 
 export function UserQRCodeDisplay({
@@ -13,34 +13,34 @@ export function UserQRCodeDisplay({
   userSlug,
   onClose,
 }: UserQRCodeDisplayProps) {
-  const qrRef = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null)
+  const [copied, setCopied] = useState(false)
 
   // Gerar URL completa do usuário (domínio + slug)
-  const userUrl = `${window.location.origin}/${userSlug}`;
+  const userUrl = `${window.location.origin}/${userSlug}`
 
   const handleShare = async () => {
-    const text = `QR Code da Mesa ${username}\n\n${userUrl}`;
+    const text = `QR Code da Mesa ${username}\n\n${userUrl}`
 
     if (navigator.share) {
       try {
         await navigator.share({
           title: `Mesa ${username}`,
           text: text,
-        });
+        })
       } catch (error) {
-        console.error("Erro ao compartilhar:", error);
+        console.error("Erro ao compartilhar:", error)
       }
     } else {
-      handleCopy();
+      handleCopy()
     }
-  };
+  }
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(userUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    navigator.clipboard.writeText(userUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <>
@@ -73,14 +73,41 @@ export function UserQRCodeDisplay({
           user-select: none;
           pointer-events: auto;
         }
+        .qr-code-container {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.5) 100%),
+                      repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.02) 10px, rgba(0,0,0,0.02) 20px);
+        }
+        .qr-code-container::before {
+          content: "QR Code Protegido";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-45deg);
+          font-size: 48px;
+          font-weight: bold;
+          color: rgba(0, 0, 0, 0.08);
+          white-space: nowrap;
+          pointer-events: none;
+          z-index: 1;
+        }
+        .qr-code-container > * {
+          position: relative;
+          z-index: 2;
+        }
       `}</style>
       <div
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 prevent-screenshot"
         onClick={onClose}
+        onContextMenu={(e) => e.preventDefault()}
       >
         <div
           className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 sm:p-8 max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => e.preventDefault()}
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">QR Code da Mesa</h2>
@@ -133,5 +160,5 @@ export function UserQRCodeDisplay({
         </div>
       </div>
     </>
-  );
+  )
 }
