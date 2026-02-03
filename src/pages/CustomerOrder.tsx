@@ -291,10 +291,6 @@ export default function CustomerOrder() {
   }, [fetchMenuItems])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchMenuItems()
-    }, 2000)
-
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         fetchMenuItems()
@@ -304,7 +300,6 @@ export default function CustomerOrder() {
     document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () => {
-      clearInterval(interval)
       document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
   }, [fetchMenuItems])
@@ -313,7 +308,7 @@ export default function CustomerOrder() {
     if (currentOrder) {
       const interval = setInterval(() => {
         fetchOrderStatus()
-      }, 2000) // Verificar status a cada 2 segundos
+      }, 5000) // Verificar status a cada 5 segundos
 
       return () => clearInterval(interval)
     }
@@ -323,7 +318,7 @@ export default function CustomerOrder() {
     if (activeTab === "orders") {
       const interval = setInterval(() => {
         checkExistingOrder()
-      }, 2000) // Atualizar histórico de pedidos a cada 2 segundos
+      }, 3000) // Atualizar histórico de pedidos a cada 5 segundos
 
       return () => clearInterval(interval)
     }
