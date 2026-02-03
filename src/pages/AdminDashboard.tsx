@@ -1214,7 +1214,7 @@ export default function AdminDashboard() {
       <header className="bg-white text-black shadow-lg sticky top-0 z-40">
         <div className="w-full py-8 px-3 sm:px-4 sm:py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-2xl font-bold">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
               Painel de Administrador
             </h1>
             <p className="text-sm sm:text-base text-gray-600 mt-1">
@@ -1228,7 +1228,7 @@ export default function AdminDashboard() {
             }}
             className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition text-sm sm:text-base"
           >
-            <LogOut className="w-8 h-6" />
+            <LogOut className="w-10 h-5" />
             <span className="hidden sm:inline">Sair</span>
           </button>
         </div>
@@ -2739,8 +2739,23 @@ export default function AdminDashboard() {
       )}
 
       {showUserModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] flex flex-col">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4"
+          onClick={() => {
+            setShowUserModal(false)
+            setUserFormData({
+              username: "",
+              phone: "",
+              password: "",
+              is_admin: false,
+              is_employee: false,
+            })
+          }}
+        >
+          <div
+            className="bg-white rounded-lg w-full max-w-md max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-4 sm:p-6 border-b flex items-center justify-between flex-shrink-0">
               <h2 className="text-lg sm:text-2xl font-bold text-black">
                 Adicionar Usuário

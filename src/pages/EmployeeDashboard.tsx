@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   LogOut,
   ChevronDown,
@@ -8,57 +8,57 @@ import {
   Unlock,
   Bell,
   X,
-} from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
-import { supabase, Order } from "../lib/supabase";
-import { toast } from "react-toastify";
+} from "lucide-react"
+import { useAuth } from "../contexts/AuthContext"
+import { supabase, Order } from "../lib/supabase"
+import { toast } from "react-toastify"
 
 const formatOrderNumericId = (id: string) => {
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < id.length; i++) {
-    hash = (hash * 31 + id.charCodeAt(i)) % 1000;
+    hash = (hash * 31 + id.charCodeAt(i)) % 1000
   }
-  if (hash < 100) hash += 100;
-  return String(hash).padStart(3, "0");
-};
+  if (hash < 100) hash += 100
+  return String(hash).padStart(3, "0")
+}
 
 const getPaymentMethodLabel = (paymentMethod: string) => {
   switch (paymentMethod) {
     case "pix":
-      return "PIX";
+      return "PIX"
     case "dinheiro":
-      return "Dinheiro";
+      return "Dinheiro"
     case "cartao_credito":
-      return "Cartão de Crédito";
+      return "Cartão de Crédito"
     case "cartao_debito":
-      return "Cartão de Débito";
+      return "Cartão de Débito"
     default:
-      return paymentMethod;
+      return paymentMethod
   }
-};
+}
 
 export default function EmployeeDashboard() {
-  const navigate = useNavigate();
-  const { logout, user } = useAuth();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
+  const navigate = useNavigate()
+  const { logout, user } = useAuth()
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<
     "orders" | "tables" | "notifications"
-  >("orders");
+  >("orders")
   const [allUsers, setAllUsers] = useState<
     Array<{ id: string; username: string }>
-  >([]);
-  const [sessionUsers, setSessionUsers] = useState<Set<string>>(new Set());
+  >([])
+  const [sessionUsers, setSessionUsers] = useState<Set<string>>(new Set())
   const [waiterCalls, setWaiterCalls] = useState<
     Array<{
-      id: string;
-      user_id: string;
-      table_name: string;
-      status: string;
-      created_at: string;
+      id: string
+      user_id: string
+      table_name: string
+      status: string
+      created_at: string
     }>
-  >([]);
+  >([])
 
   const fetchOrders = async () => {
     try {
@@ -67,40 +67,40 @@ export default function EmployeeDashboard() {
         .from("orders")
         .select("*")
         .eq("hidden", false)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
 
       if (ordersError) {
-        setOrders([]);
-        setLoading(false);
-        return;
+        setOrders([])
+        setLoading(false)
+        return
       }
 
       if (!ordersData || ordersData.length === 0) {
-        setOrders([]);
-        setLoading(false);
-        return;
+        setOrders([])
+        setLoading(false)
+        return
       }
 
       // Busca os usuários
       const { data: usersData } = await supabase
         .from("users")
-        .select("id, username");
+        .select("id, username")
 
       // Busca os itens de cada pedido
-      const orderIds = ordersData.map((o) => o.id);
+      const orderIds = ordersData.map((o) => o.id)
       const { data: itemsData } = await supabase
         .from("order_items")
         .select("*, menu_items(*)")
-        .in("order_id", orderIds);
+        .in("order_id", orderIds)
 
       // Monta os dados completos
       const completeOrders = ordersData.map((order) => {
-        const user = usersData?.find((u) => u.id === order.user_id);
+        const user = usersData?.find((u) => u.id === order.user_id)
         const assignedEmployee = usersData?.find(
           (u) => u.id === order.assigned_to,
-        );
+        )
         const items =
-          itemsData?.filter((item) => item.order_id === order.id) || [];
+          itemsData?.filter((item) => item.order_id === order.id) || []
         return {
           ...order,
           users: user ? { username: user.username } : { username: "Cliente" },
@@ -108,16 +108,16 @@ export default function EmployeeDashboard() {
             ? { username: assignedEmployee.username }
             : null,
           order_items: items,
-        };
-      });
+        }
+      })
 
-      setOrders(completeOrders as any[]);
-      setLoading(false);
+      setOrders(completeOrders as any[])
+      setLoading(false)
     } catch (error) {
-      setOrders([]);
-      setLoading(false);
+      setOrders([])
+      setLoading(false)
     }
-  };
+  }
 
   const fetchAllUsers = async () => {
     try {
@@ -126,12 +126,12 @@ export default function EmployeeDashboard() {
         .select("id, username")
         .eq("is_admin", false)
         .eq("is_employee", false)
-        .order("username");
-      setAllUsers(data || []);
+        .order("username")
+      setAllUsers(data || [])
     } catch (error) {
       // Silent fail
     }
-  };
+  }
 
   const fetchWaiterCalls = async () => {
     try {
@@ -139,44 +139,42 @@ export default function EmployeeDashboard() {
         .from("waiter_calls")
         .select("*")
         .eq("status", "pending")
-        .order("created_at", { ascending: false });
-      setWaiterCalls(data || []);
+        .order("created_at", { ascending: false })
+      setWaiterCalls(data || [])
     } catch (error) {
-      toast.error("Erro ao buscar chamadas");
+      toast.error("Erro ao buscar chamadas")
     }
-  };
+  }
 
   const markCallAsCompleted = async (callId: string) => {
     try {
       const { error } = await supabase
         .from("waiter_calls")
         .update({ status: "completed" })
-        .eq("id", callId);
+        .eq("id", callId)
 
-      if (error) throw error;
+      if (error) throw error
 
-      fetchWaiterCalls();
+      fetchWaiterCalls()
     } catch (error) {
-      toast.error("Erro ao marcar chamada como concluída");
+      toast.error("Erro ao marcar chamada como concluída")
     }
-  };
+  }
 
   const loadSessionUsers = async () => {
     try {
-      const { data } = await supabase
-        .from("active_sessions")
-        .select("username");
-      const usernames = new Set(data?.map((s: any) => s.username) || []);
-      setSessionUsers(usernames);
+      const { data } = await supabase.from("active_sessions").select("username")
+      const usernames = new Set(data?.map((s: any) => s.username) || [])
+      setSessionUsers(usernames)
     } catch (error) {
       // Silent fail
     }
-  };
+  }
 
   const reserveTable = async (username: string) => {
     try {
-      const user = allUsers.find((u) => u.username === username);
-      if (!user) return;
+      const user = allUsers.find((u) => u.username === username)
+      if (!user) return
 
       const { error } = await supabase.from("active_sessions").upsert(
         {
@@ -184,73 +182,73 @@ export default function EmployeeDashboard() {
           username: user.username,
         },
         { onConflict: "user_id" },
-      );
+      )
 
       if (error) {
-        toast.error("Erro ao reservar mesa: " + error.message);
-        return;
+        toast.error("Erro ao reservar mesa: " + error.message)
+        return
       }
 
-      toast.success(`Mesa ${username} reservada!`);
-      loadSessionUsers();
+      toast.success(`Mesa ${username} reservada!`)
+      loadSessionUsers()
     } catch (error) {
-      toast.error("Erro ao reservar mesa");
+      toast.error("Erro ao reservar mesa")
     }
-  };
+  }
 
   const releaseTable = async (username: string) => {
     try {
-      const user = allUsers.find((u) => u.username === username);
-      if (!user) return;
+      const user = allUsers.find((u) => u.username === username)
+      if (!user) return
 
       const { error } = await supabase
         .from("active_sessions")
         .delete()
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
 
       if (error) {
-        toast.error("Erro ao liberar mesa: " + error.message);
-        return;
+        toast.error("Erro ao liberar mesa: " + error.message)
+        return
       }
 
-      toast.success(`Mesa ${username} liberada!`);
-      loadSessionUsers();
+      toast.success(`Mesa ${username} liberada!`)
+      loadSessionUsers()
     } catch (error) {
-      toast.error("Erro ao liberar mesa");
+      toast.error("Erro ao liberar mesa")
     }
-  };
+  }
 
   const fetchMenuItems = async () => {
     const { data } = await supabase
       .from("menu_items")
       .select("*")
-      .eq("active", true);
+      .eq("active", true)
 
     if (data) {
       // Not needed anymore, but keeping for compatibility
     }
-  };
+  }
 
   useEffect(() => {
-    fetchMenuItems();
-    fetchOrders();
-    fetchAllUsers();
-    loadSessionUsers();
-    fetchWaiterCalls();
+    fetchMenuItems()
+    fetchOrders()
+    fetchAllUsers()
+    loadSessionUsers()
+    fetchWaiterCalls()
 
     const interval = setInterval(() => {
-      fetchOrders();
-      loadSessionUsers();
-      fetchWaiterCalls();
-    }, 2000);
+      fetchOrders()
+      loadSessionUsers()
+      fetchWaiterCalls()
+    }, 2000)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
       // Se o status é "preparing" ou "cancelled", marcar que esse funcionário aceitou/cancelou o pedido
-      const updateData: any = { status: newStatus };
+      const updateData: any = { status: newStatus }
 
       if (
         (newStatus === "preparing" || newStatus === "cancelled") &&
@@ -261,25 +259,25 @@ export default function EmployeeDashboard() {
           .from("users")
           .select("id")
           .eq("id", user.id)
-          .single();
+          .single()
 
         if (employeeExists) {
-          updateData.assigned_to = user.id;
+          updateData.assigned_to = user.id
         } else {
           toast.warn(
             "Aviso: Não foi possível atribuir o pedido a você. Por favor, faça login novamente.",
-          );
+          )
         }
       }
 
       const { error } = await supabase
         .from("orders")
         .update(updateData)
-        .eq("id", orderId);
+        .eq("id", orderId)
 
       if (error) {
-        toast.error("Erro ao atualizar pedido: " + error.message);
-        return;
+        toast.error("Erro ao atualizar pedido: " + error.message)
+        return
       }
 
       // Mensagens de feedback baseadas no status
@@ -288,77 +286,80 @@ export default function EmployeeDashboard() {
         ready: "Pedido pronto para entrega!",
         completed: "Pedido finalizado!",
         cancelled: "Pedido cancelado.",
-      };
+      }
 
-      const message = statusMessages[newStatus] || "Pedido atualizado!";
-      toast.success(message);
+      const message = statusMessages[newStatus] || "Pedido atualizado!"
+      toast.success(message)
 
-      fetchOrders();
+      fetchOrders()
     } catch (error) {
-      toast.error("Erro ao atualizar pedido. Tente novamente.");
+      toast.error("Erro ao atualizar pedido. Tente novamente.")
     }
-  };
+  }
 
   const handleDeleteOrder = async (orderId: string) => {
-    await supabase.from("orders").update({ hidden: true }).eq("id", orderId);
-    toast.error("Pedido removido da lista!");
-    fetchOrders();
-  };
+    if (!confirm("Tem certeza que deseja remover este pedido?")) {
+      return
+    }
+    await supabase.from("orders").update({ hidden: true }).eq("id", orderId)
+    toast.error("Pedido removido da lista!")
+    fetchOrders()
+  }
 
   const handleClearAllOrders = async (username: string) => {
     if (
       !confirm(`Deseja realmente limpar todos os pedidos da Mesa ${username}?`)
     ) {
-      return;
+      return
     }
 
     try {
       // Pegar todos os IDs dos pedidos dessa mesa
       const orderIds = orders
         .filter((order) => order.users?.username === username)
-        .map((order) => order.id);
+        .map((order) => order.id)
 
       // Ocultar todos os pedidos dessa mesa
       const { error } = await supabase
         .from("orders")
         .update({ hidden: true })
-        .in("id", orderIds);
+        .in("id", orderIds)
 
       if (error) {
-        toast.error("Erro ao limpar pedidos: " + error.message);
-        return;
+        toast.error("Erro ao limpar pedidos: " + error.message)
+        return
       }
 
-      toast.success(`Todos os pedidos da Mesa ${username} foram removidos!`);
-      fetchOrders();
+      toast.success(`Todos os pedidos da Mesa ${username} foram removidos!`)
+      fetchOrders()
     } catch (error) {
-      toast.error("Erro ao limpar pedidos");
+      toast.error("Erro ao limpar pedidos")
     }
-  };
+  }
 
   const toggleUserAccordion = (username: string) => {
-    const newSet = new Set(expandedUsers);
+    const newSet = new Set(expandedUsers)
     if (newSet.has(username)) {
-      newSet.delete(username);
+      newSet.delete(username)
     } else {
-      newSet.add(username);
+      newSet.add(username)
     }
-    setExpandedUsers(newSet);
-  };
+    setExpandedUsers(newSet)
+  }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-xl text-gray-600">Carregando pedidos...</div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
       <header className="bg-white shadow-md border-b sticky top-0 z-40">
-        <div className="w-full pt-8 px-3 sm:px-4 md:px-6">
+        <div className="w-full pt-4 px-3 sm:px-4 md:px-6">
           <div className="flex items-center justify-between py-3 sm:py-4">
             <div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
@@ -370,8 +371,8 @@ export default function EmployeeDashboard() {
             </div>
             <button
               onClick={() => {
-                logout();
-                navigate("/");
+                logout()
+                navigate("/")
               }}
               className="p-2 sm:p-2.5 md:p-3 hover:bg-gray-100 rounded-lg transition duration-200"
               title="Sair"
@@ -436,13 +437,13 @@ export default function EmployeeDashboard() {
                   .filter((order) => !order.hidden)
                   .reduce(
                     (acc, order) => {
-                      const username = order.users?.username || "Cliente";
-                      if (!acc[username]) acc[username] = [];
-                      acc[username].push(order);
-                      return acc;
+                      const username = order.users?.username || "Cliente"
+                      if (!acc[username]) acc[username] = []
+                      acc[username].push(order)
+                      return acc
                     },
                     {} as Record<string, typeof orders>,
-                  );
+                  )
 
                 return Object.keys(ordersByUser).length === 0 ? (
                   <p className="text-sm text-gray-500 text-center py-8">
@@ -535,12 +536,18 @@ export default function EmployeeDashboard() {
                                         Aceitar
                                       </button>
                                       <button
-                                        onClick={() =>
-                                          updateOrderStatus(
-                                            order.id,
-                                            "cancelled",
-                                          )
-                                        }
+                                        onClick={() => {
+                                          if (
+                                            window.confirm(
+                                              "Tem certeza que deseja cancelar este pedido?",
+                                            )
+                                          ) {
+                                            updateOrderStatus(
+                                              order.id,
+                                              "cancelled",
+                                            )
+                                          }
+                                        }}
                                         className="px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg text-xs sm:text-sm hover:bg-red-600 transition font-semibold flex-1"
                                       >
                                         Cancelar
@@ -558,12 +565,18 @@ export default function EmployeeDashboard() {
                                         Pronto
                                       </button>
                                       <button
-                                        onClick={() =>
-                                          updateOrderStatus(
-                                            order.id,
-                                            "cancelled",
-                                          )
-                                        }
+                                        onClick={() => {
+                                          if (
+                                            window.confirm(
+                                              "Tem certeza que deseja cancelar este pedido?",
+                                            )
+                                          ) {
+                                            updateOrderStatus(
+                                              order.id,
+                                              "cancelled",
+                                            )
+                                          }
+                                        }}
                                         className="px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg text-xs sm:text-sm hover:bg-red-600 transition font-semibold flex-1"
                                       >
                                         Cancelar
@@ -584,12 +597,18 @@ export default function EmployeeDashboard() {
                                         Finalizar
                                       </button>
                                       <button
-                                        onClick={() =>
-                                          updateOrderStatus(
-                                            order.id,
-                                            "cancelled",
-                                          )
-                                        }
+                                        onClick={() => {
+                                          if (
+                                            window.confirm(
+                                              "Tem certeza que deseja cancelar este pedido?",
+                                            )
+                                          ) {
+                                            updateOrderStatus(
+                                              order.id,
+                                              "cancelled",
+                                            )
+                                          }
+                                        }}
                                         className="px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg text-xs sm:text-sm hover:bg-red-600 transition font-semibold flex-1"
                                       >
                                         Cancelar
@@ -715,7 +734,7 @@ export default function EmployeeDashboard() {
                       )}
                     </div>
                   ))
-                );
+                )
               })()}
             </div>
           </div>
@@ -724,7 +743,7 @@ export default function EmployeeDashboard() {
             <h2 className="text-xl sm:text-2xl font-bold text-black">Mesas</h2>
             <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {allUsers.map((user) => {
-                const isActive = sessionUsers.has(user.username);
+                const isActive = sessionUsers.has(user.username)
                 return (
                   <div
                     key={user.id}
@@ -768,7 +787,7 @@ export default function EmployeeDashboard() {
                       )}
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
             {allUsers.length === 0 && (
@@ -830,5 +849,5 @@ export default function EmployeeDashboard() {
         )}
       </main>
     </div>
-  );
+  )
 }
