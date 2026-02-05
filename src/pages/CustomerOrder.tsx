@@ -633,11 +633,11 @@ export default function CustomerOrder() {
         </div>
       )}
       <div
-        className={`min-h-screen${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
+        className={`min-h-screen bg-responsive${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
         style={{
           backgroundImage: `url('/assets/bgmenu3.jpg')`,
-          backgroundSize: "cover",
           backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
         }}
       >
@@ -743,7 +743,7 @@ export default function CustomerOrder() {
                 {/* Search and Filters */}
                 <div
                   ref={filterRef}
-                  className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
+                  className="bg-white/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
                 >
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4">
                     <div className="flex-1 relative">

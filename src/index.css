@@ -47,6 +47,16 @@
     @apply text-xl sm:text-2xl md:text-3xl;
   }
 
+  .bg-responsive {
+    background-size: auto 100vh;
+  }
+
+  @media (min-width: 850px) {
+    .bg-responsive {
+      background-size: cover;
+    }
+  }
+
   .flex-mobile {
     @apply flex flex-col sm:flex-row;
   }
