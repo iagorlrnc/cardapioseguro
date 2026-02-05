@@ -641,14 +641,78 @@ export default function AdminDashboard() {
       const margin = 15
       let yPosition = margin
 
+      const ensurePageSpace = (needed: number) => {
+        if (yPosition + needed > pageHeight - margin) {
+          pdf.addPage()
+          yPosition = margin
+        }
+      }
+
+      const drawTable = (
+        title: string,
+        headers: string[],
+        rows: Array<Array<string | number>>,
+        columnWidths?: number[],
+      ) => {
+        const tableWidth = pageWidth - margin * 2
+        const widths =
+          columnWidths && columnWidths.length === headers.length
+            ? columnWidths
+            : headers.map(() => tableWidth / headers.length)
+        const headerHeight = 7
+        const rowHeight = 6
+        const cellPadding = 2
+
+        ensurePageSpace(10)
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(12)
+        pdf.setTextColor(170, 52, 28)
+        pdf.text(title, margin, yPosition)
+        yPosition += 6
+
+        ensurePageSpace(headerHeight + rowHeight)
+        let x = margin
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(10)
+        headers.forEach((header, index) => {
+          pdf.setFillColor(245, 245, 245)
+          pdf.setDrawColor(220, 220, 220)
+          pdf.rect(x, yPosition, widths[index], headerHeight, "F")
+          pdf.rect(x, yPosition, widths[index], headerHeight)
+          pdf.setTextColor(50, 50, 50)
+          pdf.text(header, x + cellPadding, yPosition + 4.8)
+          x += widths[index]
+        })
+        yPosition += headerHeight
+
+        const safeRows = rows.length > 0 ? rows : [["Sem dados"]]
+        safeRows.forEach((row) => {
+          ensurePageSpace(rowHeight)
+          let xRow = margin
+          pdf.setFont("helvetica", "normal")
+          pdf.setFontSize(9)
+          row.forEach((cell, index) => {
+            const width = widths[index] ?? widths[0]
+            pdf.setDrawColor(220, 220, 220)
+            pdf.rect(xRow, yPosition, width, rowHeight)
+            pdf.setTextColor(0, 0, 0)
+            pdf.text(String(cell), xRow + cellPadding, yPosition + 4.2)
+            xRow += width
+          })
+          yPosition += rowHeight
+        })
+
+        yPosition += 12
+      }
+
       // ========== CABEÇALHO ==========
-      // Foto centralizada e redonda
-      const imgWidth = 15
-      const imgHeight = 15
+      // Foto centralizada
+      const imgWidth = 30
+      const imgHeight = 30
       const xCenter = pageWidth / 2 - imgWidth / 2
 
-      // Função para criar imagem redonda
-      const createCircleImage = async () => {
+      // Função para carregar imagem
+      const createImageData = async () => {
         try {
           const canvas = document.createElement("canvas")
           const ctx = canvas.getContext("2d")
@@ -664,19 +728,8 @@ export default function AdminDashboard() {
 
           return new Promise<string>((resolve) => {
             img.onload = () => {
-              // Desenhar círculo branco de fundo
-              ctx.fillStyle = "#ffffff"
-              ctx.fillRect(0, 0, size, size)
-
-              // Criar clipping circle
-              ctx.beginPath()
-              ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
-              ctx.clip()
-
-              // Desenhar imagem
+              ctx.clearRect(0, 0, size, size)
               ctx.drawImage(img, 0, 0, size, size)
-
-              // Retornar data URL
               resolve(canvas.toDataURL("image/png"))
             }
 
@@ -684,34 +737,24 @@ export default function AdminDashboard() {
               resolve("")
             }
 
-            img.src = "/public/assets/.jpg"
+            img.src = "/public/assets/iconpngorange.png"
           })
         } catch (e) {
           return ""
         }
       }
 
-      // Adicionar imagem redonda
-      const circleImageData = await createCircleImage()
-      if (circleImageData) {
+      // Adicionar imagem
+      const imageData = await createImageData()
+      if (imageData) {
         try {
           pdf.addImage(
-            circleImageData,
+            imageData,
             "PNG",
             xCenter,
             yPosition,
             imgWidth,
             imgHeight,
-          )
-
-          // Desenhar borda circular
-          pdf.setDrawColor(170, 52, 28)
-          pdf.setLineWidth(0.5)
-          pdf.circle(
-            xCenter + imgWidth / 2,
-            yPosition + imgHeight / 2,
-            imgWidth / 2,
-            "S",
           )
         } catch (e) {
           // Silently fail if image can't be added
@@ -753,114 +796,64 @@ export default function AdminDashboard() {
       yPosition += 8
 
       // ========== RESUMO GERAL ==========
-      pdf.setFont("helvetica", "bold")
-      pdf.setFontSize(12)
-      pdf.setTextColor(170, 52, 28)
-      pdf.text("Resumo Geral", margin, yPosition)
-
-      yPosition += 8
-      pdf.setFont("helvetica", "normal")
-      pdf.setFontSize(10)
-      pdf.setTextColor(0)
-
-      pdf.text(`Total de Pedidos: ${totalOrders}`, margin + 3, yPosition)
-      yPosition += 6
-      pdf.text(
-        `Faturamento Total: R$ ${totalRevenue.toFixed(2)}`,
-        margin + 3,
-        yPosition,
+      drawTable(
+        "Resumo Geral",
+        ["Item", "Quantidade"],
+        [
+          ["Total de Pedidos", totalOrders],
+          ["Faturamento Total", `R$ ${totalRevenue.toFixed(2)}`],
+        ],
+        [90, 90],
       )
 
-      yPosition += 10
-
       // ========== TOP 5 ITENS MAIS VENDIDOS ==========
-      pdf.setFont("helvetica", "bold")
-      pdf.setFontSize(12)
-      pdf.setTextColor(170, 52, 28)
-      pdf.text("Itens Mais Vendidos", margin, yPosition)
-
-      yPosition += 8
-      pdf.setFont("helvetica", "normal")
-      pdf.setFontSize(10)
-      pdf.setTextColor(0)
-
-      if (topItems.length > 0) {
-        topItems.forEach((item, index) => {
-          pdf.text(
-            `${index + 1}. ${item.name} - ${item.quantity} unidades`,
-            margin + 3,
-            yPosition,
-          )
-          yPosition += 6
-        })
-      } else {
-        pdf.text("Sem vendas registradas", margin + 3, yPosition)
-        yPosition += 6
-      }
-
-      yPosition += 4
+      drawTable(
+        "Itens Mais Vendidos",
+        ["Item", "Quantidade"],
+        topItems.map((item) => [item.name, `${item.quantity} un`]),
+        [120, 60],
+      )
 
       // ========== FORMAS DE PAGAMENTO ==========
-      pdf.setFont("helvetica", "bold")
-      pdf.setFontSize(12)
-      pdf.setTextColor(170, 52, 28)
-      pdf.text("Formas de Pagamento", margin, yPosition)
+      const paymentRows = Array.from(paymentMethodsData.entries()).map(
+        ([method, data]) => {
+          const methodLabel =
+            method === "pix"
+              ? "PIX"
+              : method === "dinheiro"
+                ? "Dinheiro"
+                : method === "cartao_credito"
+                  ? "Cartão de Crédito"
+                  : method === "cartao_debito"
+                    ? "Cartão de Débito"
+                    : method
+          return [methodLabel, data.count, `R$ ${data.total.toFixed(2)}`]
+        },
+      )
 
-      yPosition += 8
-      pdf.setFont("helvetica", "normal")
-      pdf.setFontSize(10)
-      pdf.setTextColor(0)
-
-      paymentMethodsData.forEach((data, method) => {
-        const methodLabel =
-          method === "pix"
-            ? "PIX"
-            : method === "dinheiro"
-              ? "Dinheiro"
-              : method === "cartao_credito"
-                ? "Cartão de Crédito"
-                : method === "cartao_debito"
-                  ? "Cartão de Débito"
-                  : method
-        pdf.text(
-          `${methodLabel}: ${data.count} transações - R$ ${data.total.toFixed(2)}`,
-          margin + 3,
-          yPosition,
-        )
-        yPosition += 6
-
-        // Verificar se precisa de nova página
-        if (yPosition > pageHeight - margin - 20) {
-          pdf.addPage()
-          yPosition = margin
-        }
-      })
-
-      yPosition += 4
+      drawTable(
+        "Formas de Pagamento",
+        ["Método", "Transações", "Total"],
+        paymentRows,
+        [80, 40, 60],
+      )
 
       // ========== PERFORMANCE DOS FUNCIONÁRIOS ==========
       if (employees && employees.length > 0) {
-        pdf.setFont("helvetica", "bold")
-        pdf.setFontSize(12)
-        pdf.setTextColor(170, 52, 28)
-        pdf.text("Performance dos Funcionários", margin, yPosition)
-
-        yPosition += 8
-        pdf.setFont("helvetica", "normal")
-        pdf.setFontSize(9)
-        pdf.setTextColor(0)
-
-        employeePerformanceMap.forEach((perf) => {
-          const lineText = `${perf.username}: ${perf.completedOrders} finalizados, ${perf.cancelledOrders} cancelados, R$ ${perf.totalRevenue.toFixed(2)}`
-          pdf.text(lineText, margin + 3, yPosition)
-          yPosition += 6
-
-          // Verificar se precisa de nova página
-          if (yPosition > pageHeight - margin - 10) {
-            pdf.addPage()
-            yPosition = margin
-          }
-        })
+        const perfRows = Array.from(employeePerformanceMap.values()).map(
+          (perf) => [
+            perf.username,
+            perf.completedOrders,
+            perf.cancelledOrders,
+            `R$ ${perf.totalRevenue.toFixed(2)}`,
+          ],
+        )
+        drawTable(
+          "Performance dos Funcionários",
+          ["Funcionário", "Finalizados", "Cancelados", "Valor Total"],
+          perfRows,
+          [70, 35, 35, 40],
+        )
       }
 
       // Footer
@@ -1609,7 +1602,7 @@ export default function AdminDashboard() {
                         const todayOrders = orders.filter(
                           (order) =>
                             new Date(order.created_at).toDateString() ===
-                              today && order.status !== "cancelled",
+                              today && order.status === "completed",
                         )
 
                         const itemCounts: {
