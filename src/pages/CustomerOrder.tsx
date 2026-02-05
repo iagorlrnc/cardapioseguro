@@ -718,8 +718,8 @@ export default function CustomerOrder() {
 
             {/* Mobile only title */}
             <div className="sm:hidden text-center mt-2">
-              <h1 className="text-base font-bold text-gray-900">Cardápio</h1>
-              <p className="text-xs text-gray-600 mt-0.5">
+              <h1 className="text-base font-bold text-white">Cardápio</h1>
+              <p className="text-xs text-white mt-0.5">
                 Mesa <span className="font-semibold">{user?.username}</span>
               </p>
             </div>
@@ -844,9 +844,6 @@ export default function CustomerOrder() {
 
                   <div>
                     <div className="mb-4 sm:mb-6 md:hidden">
-                      className="relative z-0 bg-white/20 backdrop-blur-sm
-                      rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md
-                      transition-shadow"
                       <div className="flex justify-center mb-3 sm:mb-4">
                         <div className="relative w-full max-w-xs">
                           <button
