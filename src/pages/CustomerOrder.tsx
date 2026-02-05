@@ -633,7 +633,13 @@ export default function CustomerOrder() {
         </div>
       )}
       <div
-        className={`min-h-screen bg-gradient-to-br from-gray-50 to-gray-100${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
+        className={`min-h-screen${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
+        style={{
+          backgroundImage: `url('/assets/bgmenu3.jpg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundAttachment: "fixed",
+        }}
       >
         {/* Header */}
         <header className="sticky top-0 left-0 right-0 z-40 bg-white shadow-md border-b safe-area-top">
@@ -723,7 +729,7 @@ export default function CustomerOrder() {
                 <button
                   onClick={handleCallWaiter}
                   disabled={callingWaiter}
-                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                  className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                 >
                   <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
                   <span className="text-sm sm:text-base">
@@ -783,7 +789,7 @@ export default function CustomerOrder() {
                       </button>
 
                       {isFilterOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
                           {[
                             "Todos",
                             ...categories.filter((cat) => cat !== "todos"),
@@ -858,7 +864,7 @@ export default function CustomerOrder() {
                           </button>
 
                           {isFilterOpen && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
                               {[
                                 "Todos",
                                 ...categories.filter((cat) => cat !== "todos"),
@@ -953,32 +959,38 @@ export default function CustomerOrder() {
                     )
                     return (
                       <div key={category} className="mb-6 sm:mb-8">
-                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 border-b pb-2">
-                          {category.replace(/\b\w/g, (l) => l.toUpperCase())}
+                        <h2
+                          className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 border-b pb-2 uppercase text-center"
+                          style={{
+                            WebkitTextStroke: ".5px black",
+                            fontFamily: "Economica, sans-serif",
+                          }}
+                        >
+                          {category}
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                           {items.map((item) => (
                             <div
                               key={item.id}
-                              className="bg-white rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow"
+                              className="relative bg-cover rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow before:absolute before:inset-0 before:bg-black/70 before:rounded-lg before:z-0"
                             >
-                              <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-3 sm:gap-4">
+                              <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-3 sm:gap-4 relative z-10">
                                 <img
                                   src={item.image_url}
                                   alt={item.name}
                                   className="w-16 h-16 xs:w-20 xs:h-20 object-cover rounded-lg flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0 w-full">
-                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2">
+                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2 text-white">
                                     {item.name}
                                   </h3>
                                   <button
                                     onClick={() => openItemDetails(item)}
-                                    className="text-blue-600 hover:text-blue-800 text-xs xs:text-sm font-medium mb-2 block"
+                                    className="text-blue-400 hover:text-blue-300 text-xs xs:text-sm font-medium mb-2 block underline"
                                   >
                                     ver detalhes
                                   </button>
-                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-gray-900 block mb-2 xs:mb-0">
+                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-white block mb-2 xs:mb-0">
                                     R$ {item.price.toFixed(2)}
                                   </span>
                                 </div>
