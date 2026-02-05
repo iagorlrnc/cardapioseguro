@@ -49,11 +49,13 @@
 
   .bg-responsive {
     background-size: auto calc(100vh + 30px);
+    background-attachment: fixed;
   }
 
   @media (min-width: 850px) {
     .bg-responsive {
       background-size: cover;
+      background-attachment: fixed;
     }
   }
 
