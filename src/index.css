@@ -3,10 +3,16 @@
 @tailwind utilities;
 @layer base {
   html {
+    background-color: #000; /* Substitua pela cor do seu layout */
+    margin: 0;
+    padding: 0;
     scroll-behavior: smooth;
   }
 
   body {
+    background-color: #000; /* Substitua pela cor do seu layout */
+    margin: 0;
+    padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "kern" 1;
