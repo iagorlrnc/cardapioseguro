@@ -48,7 +48,7 @@
   }
 
   .bg-responsive {
-    background-size: auto calc(100vh + 30px);
+    background-size: auto calc(100vh + 60px);
   }
 
   @media (min-width: 850px) {
