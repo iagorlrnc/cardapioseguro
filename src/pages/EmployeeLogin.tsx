@@ -123,28 +123,25 @@ export default function EmployeeLogin({
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-[url('/assets/bg.jpg')] bg-cover bg-center flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="mb-6 flex flex-col items-center">
-          <img
-            src="/assets/imagewhite.png"
-            className="w-24 h-24 object-cover rounded-full mb-2"
-          />
-          <h1 className="text-4xl font-bold text-white mb-2 text-center">
-            Nome
-          </h1>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-2xl p-8">
+        <div className="relative bg-cover rounded-lg shadow-2xl p-8 before:absolute before:inset-0 before:bg-black/70 before:rounded-lg before:z-0">
           {!showRegister ? (
             <>
-              <h2 className="text-2xl font-bold text-center mb-6 text-black">
-                Login Funcionário
-              </h2>
+              <div className="relative z-10 mb-0 flex flex-col items-center">
+                <img
+                  src="/assets/iconwhitepng.png"
+                  className="w-24 h-24 object-cover rounded-full mb-2"
+                />
+                <img
+                  src="/assets/loginfuncionariowhite.png"
+                  className="w-32 object-contain mb-2"
+                />
+              </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="relative z-10 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white mb-1">
                     Nome de Usuário
                   </label>
                   <input
@@ -158,7 +155,7 @@ export default function EmployeeLogin({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white mb-1">
                     Senha
                   </label>
                   <input
@@ -172,7 +169,7 @@ export default function EmployeeLogin({
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+                  <div className="relative z-10 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
                     {error}
                   </div>
                 )}
@@ -180,16 +177,16 @@ export default function EmployeeLogin({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="relative z-10 w-full bg-[#f8a808] text-black py-3 rounded-lg font-semibold hover:bg-[#ffd814] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? "Entrando..." : "Entrar"}
                 </button>
               </form>
 
-              <div className="mt-6 space-y-3">
+              <div className="relative z-10 mt-6 space-y-3">
                 <button
                   onClick={() => setShowRegister(true)}
-                  className="w-full text-sm text-white bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg transition font-semibold"
+                  className="w-full text-sm text-white bg-[#013d5a] hover:bg-[#0084c4] px-4 py-2 rounded-lg transition font-semibold"
                 >
                   Cadastro
                 </button>
@@ -197,15 +194,15 @@ export default function EmployeeLogin({
                 <div className="text-center space-y-3">
                   <button
                     onClick={onSwitchToAdmin}
-                    className="block w-full text-sm text-gray-600 hover:text-black transition"
+                    className="block w-full text-sm text-white hover:text-[#0135d0] transition"
                   >
                     Acesso Administrador{" "}
-                    <span className="font-semibold">Login Admin</span>
+                    <span className="font-semibold">Login Administrador</span>
                   </button>
 
                   <button
                     onClick={onSwitchToLogin}
-                    className="text-sm text-gray-600 hover:text-black transition"
+                    className="text-sm text-white hover:text-[#0135d0] transition"
                   >
                     Voltar ao <span className="font-semibold">Login</span>
                   </button>
@@ -214,13 +211,20 @@ export default function EmployeeLogin({
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-bold text-center mb-6 text-black">
-                Cadastro de Funcionário
-              </h2>
+              <div className="relative z-10 flex justify-center mb-6">
+                <img
+                  src="/assets/cadastrofuncionariowhite.png"
+                  alt="Cadastro de Funcionário"
+                  className="w-32 object-contain"
+                />
+              </div>
 
-              <form onSubmit={handleRegisterSubmit} className="space-y-4">
+              <form
+                onSubmit={handleRegisterSubmit}
+                className="relative z-10 space-y-4"
+              >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white mb-1">
                     Nome de Usuário
                   </label>
                   <input
@@ -233,7 +237,7 @@ export default function EmployeeLogin({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white mb-1">
                     Telefone
                   </label>
                   <input
@@ -249,7 +253,7 @@ export default function EmployeeLogin({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white mb-1">
                     Senha
                   </label>
                   <input
@@ -260,14 +264,14 @@ export default function EmployeeLogin({
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-white mt-1">
                     Mínimo 8 caracteres, com letra maiúscula e caractere
                     especial (!@#$%^&* etc.)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white mb-1">
                     Confirmar Senha
                   </label>
                   <input
@@ -281,7 +285,7 @@ export default function EmployeeLogin({
                 </div>
 
                 {regError && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                  <div className="relative z-10 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
                     {regError}
                   </div>
                 )}
@@ -289,7 +293,7 @@ export default function EmployeeLogin({
                 <button
                   type="submit"
                   disabled={regLoading}
-                  className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="relative z-10 w-full bg-[#f8a808] text-black py-3 rounded-lg font-semibold hover:bg-[#ffd814] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {regLoading
                     ? "Enviando solicitação..."
@@ -297,10 +301,10 @@ export default function EmployeeLogin({
                 </button>
               </form>
 
-              <div className="mt-6 text-center">
+              <div className="relative z-10 mt-6 text-center">
                 <button
                   onClick={() => setShowRegister(false)}
-                  className="text-sm text-gray-600 hover:text-black transition"
+                  className="text-sm text-white hover:text-[#0135d0] transition font-semibold"
                 >
                   Voltar ao <span className="font-semibold">Login</span>
                 </button>

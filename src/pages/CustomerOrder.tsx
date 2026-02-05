@@ -13,7 +13,7 @@ import {
   ChefHat,
   Utensils,
   History,
-  Home,
+  BookOpenCheck,
   Filter,
   ChevronDown,
   Share2,
@@ -620,9 +620,9 @@ export default function CustomerOrder() {
           onClick={() => setShowWelcome(false)}
         >
           <img
-            src="/assets/.jpg"
+            src="/assets/iconpngorange.png"
             alt="Bem-vindo"
-            className="w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24 mb-4 sm:mb-6 object-cover rounded-full"
+            className="w-32 sm:h-20 md:h-24 object-cover rounded-full"
           />
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 text-center break-words px-4">
             Bem-vindo
@@ -648,7 +648,7 @@ export default function CustomerOrder() {
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <BookOpenCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="hidden xs:inline">Cardápio</span>
                 </button>
                 <button

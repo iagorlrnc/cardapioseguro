@@ -6,6 +6,7 @@ import {
   ShoppingBag,
   Plus,
   Edit2,
+  BookOpenCheck,
   Trash2,
   X,
   BarChart3,
@@ -133,6 +134,7 @@ export default function AdminDashboard() {
   const [showPendingRequestsModal, setShowPendingRequestsModal] =
     useState(false)
   const [pendingUsers, setPendingUsers] = useState<User[]>([])
+  const [activeSessions, setActiveSessions] = useState<string[]>([])
   const [employeePerformance, setEmployeePerformance] = useState<
     Array<{
       userId: string
@@ -194,6 +196,17 @@ export default function AdminDashboard() {
       return () => clearInterval(interval)
     }
   }, [activeTab, showPendingRequestsModal])
+
+  useEffect(() => {
+    if (activeTab === "users") {
+      fetchActiveSessions()
+      const interval = setInterval(() => {
+        fetchActiveSessions()
+      }, 5000)
+
+      return () => clearInterval(interval)
+    }
+  }, [activeTab])
 
   const fetchMenuItems = async () => {
     const { data } = await supabase
@@ -308,6 +321,16 @@ export default function AdminDashboard() {
       .eq("approval_status", "pending")
       .order("created_at", { ascending: true })
     if (data) setPendingUsers(data as User[])
+  }
+
+  const fetchActiveSessions = async () => {
+    const { data, error } = await supabase
+      .from("active_sessions")
+      .select("username")
+
+    if (!error) {
+      setActiveSessions(data?.map((session: any) => session.username) || [])
+    }
   }
 
   const handleOpenPendingRequests = () => {
@@ -961,6 +984,8 @@ export default function AdminDashboard() {
     setImageFile(file)
     const reader = new FileReader()
     reader.onload = (event) => {
+
+
       setImagePreview(event.target?.result as string)
     }
     reader.readAsDataURL(file)
@@ -1157,7 +1182,10 @@ export default function AdminDashboard() {
     ) {
       await supabase
         .from("users")
-        .update({ is_admin: !currentAdmin, is_employee: false })
+        .update({
+          is_admin: !currentAdmin,
+          is_employee: currentAdmin ? true : false,
+        })
         .eq("id", userId)
       fetchUsers()
     }
@@ -1284,14 +1312,28 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => setActiveTab("users")}
-                className={`flex-1 min-w-20 sm:min-w-0 px-2 sm:px-6 py-3 sm:py-4 font-semibold flex items-center justify-center gap-1 sm:gap-2 transition text-xs sm:text-base ${
+                className={`relative flex-1 min-w-20 sm:min-w-0 px-2 sm:px-6 py-3 sm:py-4 font-semibold flex items-center justify-center gap-1 sm:gap-2 transition text-xs sm:text-base ${
                   activeTab === "users"
                     ? "bg-black text-white"
                     : "bg-white text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                <Users className="w-4 sm:w-5 h-4 sm:h-5" />
-                <span className="hidden sm:inline">Usuários</span>
+                <span className="relative flex items-center">
+                  <Users className="w-4 sm:w-5 h-4 sm:h-5" />
+                  {pendingUsers.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] leading-none min-w-4 h-4 px-1 rounded-full flex items-center justify-center sm:hidden">
+                      {pendingUsers.length}
+                    </span>
+                  )}
+                </span>
+                <span className="relative hidden sm:inline">
+                  Usuários
+                  {pendingUsers.length > 0 && (
+                    <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] leading-none min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+                      {pendingUsers.length}
+                    </span>
+                  )}
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab("performance")}
@@ -1451,7 +1493,7 @@ export default function AdminDashboard() {
                           {menuItems.length}
                         </p>
                       </div>
-                      <Edit2 className="w-6 sm:w-8 h-6 sm:h-8 text-orange-600" />
+                      <BookOpenCheck className="w-6 sm:w-8 h-6 sm:h-8 text-orange-600" />
                     </div>
                   </div>
                 </div>
@@ -2183,10 +2225,25 @@ export default function AdminDashboard() {
                                       <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-black">
                                         Usuário
                                       </th>
-                                      <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-black hidden sm:table-cell">
-                                        Telefone
-                                      </th>
-                                      {type !== "Cliente" && (
+                                      {type === "Mesa" ? (
+                                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-black hidden sm:table-cell">
+                                          Situação
+                                        </th>
+                                      ) : (
+                                        <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-black hidden sm:table-cell">
+                                          Telefone
+                                        </th>
+                                      )}
+                                      {type === "Mesa" ? (
+                                        <>
+                                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-black hidden md:table-cell">
+                                            Pedidos
+                                          </th>
+                                          <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-black hidden md:table-cell">
+                                            Valor total
+                                          </th>
+                                        </>
+                                      ) : (
                                         <>
                                           <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-black hidden md:table-cell">
                                             Admin
@@ -2205,104 +2262,144 @@ export default function AdminDashboard() {
                                     {typeUsers
                                       .slice()
                                       .sort(compareUsernames)
-                                      .map((user) => (
-                                        <tr
-                                          key={user.id}
-                                          className="border-b hover:bg-gray-100"
-                                        >
-                                          <td className="px-2 sm:px-4 py-2 sm:py-3 text-black text-xs sm:text-sm">
-                                            <div className="truncate">
-                                              {user.username}
-                                            </div>
-                                            <div className="text-gray-600 text-xs sm:hidden">
-                                              {user.phone &&
-                                              !/^0+$/.test(user.phone)
-                                                ? user.phone
-                                                : "-"}
-                                            </div>
-                                          </td>
-                                          <td className="px-2 sm:px-4 py-2 sm:py-3 text-gray-600 hidden sm:table-cell">
-                                            {user.phone &&
-                                            !/^0+$/.test(user.phone)
-                                              ? user.phone
-                                              : "-"}
-                                          </td>
-                                          {type !== "Cliente" && (
-                                            <>
-                                              <td className="px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
+                                      .map((user) => {
+                                        const isOccupied =
+                                          activeSessions.includes(user.username)
+                                        const mesaOrders = orders.filter(
+                                          (order) => order.user_id === user.id,
+                                        )
+                                        const mesaOrdersCount =
+                                          mesaOrders.length
+                                        const mesaTotal = mesaOrders.reduce(
+                                          (sum, order) =>
+                                            sum + (order.total || 0),
+                                          0,
+                                        )
+
+                                        return (
+                                          <tr
+                                            key={user.id}
+                                            className="border-b hover:bg-gray-100"
+                                          >
+                                            <td className="px-2 sm:px-4 py-2 sm:py-3 text-black text-xs sm:text-sm">
+                                              <div className="truncate">
+                                                {user.username}
+                                              </div>
+                                              <div className="text-gray-600 text-xs sm:hidden">
+                                                {type === "Mesa" ? (
+                                                  <span
+                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                                      isOccupied
+                                                        ? "bg-red-100 text-red-800"
+                                                        : "bg-green-100 text-green-800"
+                                                    }`}
+                                                  >
+                                                    {isOccupied
+                                                      ? "Ocupada"
+                                                      : "Livre"}
+                                                  </span>
+                                                ) : user.phone &&
+                                                  !/^0+$/.test(user.phone) ? (
+                                                  user.phone
+                                                ) : (
+                                                  "-"
+                                                )}
+                                              </div>
+                                            </td>
+                                            {type === "Mesa" ? (
+                                              <td className="px-2 sm:px-4 py-2 sm:py-3 hidden sm:table-cell">
                                                 <span
                                                   className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                    user.is_admin
-                                                      ? "bg-green-100 text-green-800"
-                                                      : "bg-gray-100 text-gray-800"
+                                                    isOccupied
+                                                      ? "bg-red-100 text-red-800"
+                                                      : "bg-green-100 text-green-800"
                                                   }`}
                                                 >
-                                                  {user.is_admin
-                                                    ? "Sim"
-                                                    : "Não"}
+                                                  {isOccupied
+                                                    ? "Ocupada"
+                                                    : "Livre"}
                                                 </span>
                                               </td>
-                                              <td className="px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
-                                                <span
-                                                  className={`px-2 py-1 rounded text-xs font-semibold ${
-                                                    user.is_employee
-                                                      ? "bg-blue-100 text-blue-800"
-                                                      : "bg-gray-100 text-gray-800"
-                                                  }`}
-                                                >
-                                                  {user.is_employee
-                                                    ? "Sim"
-                                                    : "Não"}
-                                                </span>
+                                            ) : (
+                                              <td className="px-2 sm:px-4 py-2 sm:py-3 text-gray-600 hidden sm:table-cell">
+                                                {user.phone &&
+                                                !/^0+$/.test(user.phone)
+                                                  ? user.phone
+                                                  : "-"}
                                               </td>
-                                            </>
-                                          )}
-                                          <td className="px-2 sm:px-4 py-2 sm:py-3">
-                                            <div className="flex gap-1 justify-center flex-wrap">
-                                              {type !== "Mesa" && (
-                                                <>
-                                                  <button
-                                                    onClick={() =>
-                                                      handleToggleAdmin(
-                                                        user.id,
-                                                        user.is_admin,
-                                                      )
-                                                    }
-                                                    className="px-2 sm:px-3 py-1 bg-black text-white rounded hover:bg-gray-800 transition text-xs flex-1 min-w-20"
-                                                    title="Gerenciar permissão de admin"
+                                            )}
+                                            {type === "Mesa" ? (
+                                              <>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell text-gray-700">
+                                                  {mesaOrdersCount}
+                                                </td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell text-gray-700">
+                                                  R$ {mesaTotal.toFixed(2)}
+                                                </td>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
+                                                  <span
+                                                    className={`px-2 py-1 rounded text-xs font-semibold ${
+                                                      user.is_admin
+                                                        ? "bg-green-100 text-green-800"
+                                                        : "bg-gray-100 text-gray-800"
+                                                    }`}
                                                   >
                                                     {user.is_admin
-                                                      ? "Remover Admin"
-                                                      : "Tornar Admin"}
-                                                  </button>
-                                                  {!user.is_employee && (
+                                                      ? "Sim"
+                                                      : "Não"}
+                                                  </span>
+                                                </td>
+                                                <td className="px-2 sm:px-4 py-2 sm:py-3 hidden md:table-cell">
+                                                  <span
+                                                    className={`px-2 py-1 rounded text-xs font-semibold ${
+                                                      user.is_employee
+                                                        ? "bg-blue-100 text-blue-800"
+                                                        : "bg-gray-100 text-gray-800"
+                                                    }`}
+                                                  >
+                                                    {user.is_employee
+                                                      ? "Sim"
+                                                      : "Não"}
+                                                  </span>
+                                                </td>
+                                              </>
+                                            )}
+                                            <td className="px-2 sm:px-4 py-2 sm:py-3">
+                                              <div className="flex gap-1 justify-center flex-wrap">
+                                                {type !== "Mesa" && (
+                                                  <>
                                                     <button
                                                       onClick={() =>
-                                                        handleToggleEmployee(
+                                                        handleToggleAdmin(
                                                           user.id,
-                                                          !!user.is_employee,
+                                                          user.is_admin,
                                                         )
                                                       }
-                                                      className="px-2 sm:px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs flex-1 min-w-20"
-                                                      title="Gerenciar permissão de funcionário"
+                                                      className="px-2 sm:px-3 py-1 bg-black text-white rounded hover:bg-gray-800 transition text-xs flex-1 min-w-20"
+                                                      title="Gerenciar permissão de admin"
                                                     >
-                                                      Tornar Funcionário
+                                                      {user.is_admin
+                                                        ? "Remover Admin"
+                                                        : "Tornar Admin"}
                                                     </button>
-                                                  )}
-                                                </>
-                                              )}
-                                              <button
-                                                onClick={() =>
-                                                  handleDeleteUser(user.id)
-                                                }
-                                                className="px-2 sm:px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-xs"
-                                              >
-                                                <Trash2 className="w-3 h-3 inline" />
-                                              </button>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      ))}
+                                                  </>
+                                                )}
+                                                <button
+                                                  onClick={() =>
+                                                    handleDeleteUser(user.id)
+                                                  }
+                                                  className="px-2 sm:px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition text-xs"
+                                                >
+                                                  <Trash2 className="w-3 h-3 inline" />
+                                                </button>
+                                              </div>
+                                            </td>
+                                          </tr>
+                                        )
+                                      })}
                                   </tbody>
                                 </table>
                               </div>
@@ -2340,7 +2437,7 @@ export default function AdminDashboard() {
                               Cancelados
                             </th>
                             <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-black">
-                              Renda
+                              Valor
                             </th>
                           </tr>
                         </thead>
@@ -2410,7 +2507,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="bg-purple-50 p-3 sm:p-4 rounded-lg border border-purple-200">
                         <p className="text-xs sm:text-sm text-gray-600">
-                          Renda Total
+                          Valor Total
                         </p>
                         <p className="text-2xl sm:text-3xl font-bold text-purple-600 mt-1">
                           R${" "}
