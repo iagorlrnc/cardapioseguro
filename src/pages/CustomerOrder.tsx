@@ -691,6 +691,7 @@ export default function CustomerOrder() {
           backgroundRepeat: "no-repeat",
         }}
       />
+      <div className="fixed inset-0 bg-black/50 pointer-events-none" />
       <div
         className={`min-h-screen${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
       >
