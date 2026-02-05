@@ -632,14 +632,17 @@ export default function CustomerOrder() {
           </p>
         </div>
       )}
+      {/* Fixed background image */}
       <div
-        className={`min-h-screen bg-responsive${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
+        className="fixed inset-0 bg-responsive -z-10"
         style={{
           backgroundImage: `url('/assets/bgmenu3.jpg')`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
         }}
+      />
+      <div
+        className={`min-h-screen${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
       >
         {/* Header */}
         <header className="sticky top-0 left-0 right-0 z-40 bg-white shadow-md border-b safe-area-top">
