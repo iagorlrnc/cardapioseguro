@@ -32,21 +32,6 @@ type TabType =
 
 const API_BASE = import.meta.env.VITE_API_URL || ""
 
-const generateSlug = (value: string) => {
-  const base = value
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-  const suffix =
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID().slice(0, 8)
-      : Math.random().toString(36).slice(2, 10)
-  return base ? `${base}-${suffix}` : suffix
-}
-
 const getPaymentMethodLabel = (paymentMethod: string) => {
   switch (paymentMethod) {
     case "pix":
@@ -984,8 +969,6 @@ export default function AdminDashboard() {
     setImageFile(file)
     const reader = new FileReader()
     reader.onload = (event) => {
-
-
       setImagePreview(event.target?.result as string)
     }
     reader.readAsDataURL(file)
@@ -1186,23 +1169,6 @@ export default function AdminDashboard() {
           is_admin: !currentAdmin,
           is_employee: currentAdmin ? true : false,
         })
-        .eq("id", userId)
-      fetchUsers()
-    }
-  }
-
-  const handleToggleEmployee = async (
-    userId: string,
-    currentEmployee: boolean,
-  ) => {
-    if (
-      confirm(
-        `Deseja ${currentEmployee ? "remover" : "conceder"} permissão de funcionário?`,
-      )
-    ) {
-      await supabase
-        .from("users")
-        .update({ is_employee: !currentEmployee, is_admin: false })
         .eq("id", userId)
       fetchUsers()
     }
