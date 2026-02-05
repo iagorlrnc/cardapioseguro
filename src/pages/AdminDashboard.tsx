@@ -978,14 +978,24 @@ export default function AdminDashboard() {
     e.preventDefault()
 
     try {
-      // Validar a senha com Zod
-      const passwordValidation = passwordSchema.safeParse(userFormData.password)
+      // Determinar a senha a ser usada
+      let password = userFormData.password
 
-      if (!passwordValidation.success) {
-        const firstIssue = passwordValidation.error.issues?.[0]
-        const errorMessage = firstIssue?.message || "Senha inválida."
-        toast.error(`Senha inválida: ${errorMessage}`)
-        return
+      // Se for cliente/mesa (não é admin nem funcionário), gerar senha padrão
+      if (!userFormData.is_admin && !userFormData.is_employee) {
+        password = `Mesa${userFormData.username}@2024`
+      } else {
+        // Para admin e funcionário, validar a senha com Zod
+        const passwordValidation = passwordSchema.safeParse(
+          userFormData.password,
+        )
+
+        if (!passwordValidation.success) {
+          const firstIssue = passwordValidation.error.issues?.[0]
+          const errorMessage = firstIssue?.message || "Senha inválida."
+          toast.error(`Senha inválida: ${errorMessage}`)
+          return
+        }
       }
 
       // Verificar se o usuário já existe
@@ -1009,7 +1019,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({
           username: userFormData.username,
           phone,
-          password: userFormData.password,
+          password: password,
           is_admin: userFormData.is_admin,
           is_employee: userFormData.is_employee,
         }),

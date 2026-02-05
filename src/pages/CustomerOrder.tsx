@@ -61,6 +61,9 @@ export default function CustomerOrder() {
   const [showUserQRCode, setShowUserQRCode] = useState(false)
   const [callingWaiter, setCallingWaiter] = useState(false)
   const [lastWaiterCall, setLastWaiterCall] = useState<number | null>(null)
+  const [itemQuantitySelector, setItemQuantitySelector] = useState<{
+    [key: string]: number
+  }>({})
   const toastTimeoutRef = useRef<number | null>(null)
   const filterRef = useRef<HTMLDivElement>(null)
 
@@ -339,17 +342,24 @@ export default function CustomerOrder() {
     }
   }, [viewingOrderId, activeTab])
 
-  const addToCart = (item: MenuItem) => {
+  const addToCart = (item: MenuItem, quantity: number = 1) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id)
       if (existingItem) {
         return prevCart.map((cartItem) =>
           cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            ? { ...cartItem, quantity: cartItem.quantity + quantity }
             : cartItem,
         )
       }
-      return [...prevCart, { ...item, quantity: 1 }]
+      return [...prevCart, { ...item, quantity }]
+    })
+
+    // Limpar o seletor de quantidade
+    setItemQuantitySelector((prev) => {
+      const newSelector = { ...prev }
+      delete newSelector[item.id]
+      return newSelector
     })
 
     // Mostrar toast de confirmação
@@ -362,6 +372,41 @@ export default function CustomerOrder() {
       setShowToast(false)
       toastTimeoutRef.current = null
     }, 2500)
+  }
+
+  const handleCartButtonClick = (itemId: string) => {
+    setItemQuantitySelector((prev) => ({
+      ...prev,
+      [itemId]: 1,
+    }))
+  }
+
+  const incrementQuantity = (itemId: string) => {
+    setItemQuantitySelector((prev) => ({
+      ...prev,
+      [itemId]: (prev[itemId] || 1) + 1,
+    }))
+  }
+
+  const decrementQuantity = (itemId: string) => {
+    setItemQuantitySelector((prev) => {
+      const currentQty = prev[itemId] || 1
+      if (currentQty > 1) {
+        return {
+          ...prev,
+          [itemId]: currentQty - 1,
+        }
+      }
+      // Se quantidade for 1 e decrementar, remover o seletor
+      const newSelector = { ...prev }
+      delete newSelector[itemId]
+      return newSelector
+    })
+  }
+
+  const confirmAddToCart = (item: MenuItem) => {
+    const quantity = itemQuantitySelector[item.id] || 1
+    addToCart(item, quantity)
   }
 
   const openItemDetails = (item: MenuItem) => {
@@ -748,7 +793,7 @@ export default function CustomerOrder() {
                 {/* Search and Filters */}
                 <div
                   ref={filterRef}
-                  className="relative z-50 bg-black/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
+                  className="relative z-50 bg-white/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
                 >
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4">
                     <div className="flex-1 relative">
@@ -975,7 +1020,7 @@ export default function CustomerOrder() {
                           {items.map((item) => (
                             <div
                               key={item.id}
-                              className="bg-black/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow"
+                              className="bg-white/35 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow"
                             >
                               <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-3 sm:gap-4">
                                 <img
@@ -984,27 +1029,61 @@ export default function CustomerOrder() {
                                   className="w-16 h-16 xs:w-20 xs:h-20 object-cover rounded-lg flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0 w-full">
-                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2 text-white">
+                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2 text-black">
                                     {item.name}
                                   </h3>
                                   <button
                                     onClick={() => openItemDetails(item)}
-                                    className="text-[#3b66ff] hover:text-[#0000fa] text-xs xs:text-sm font-medium mb-2 block underline"
+                                    className="text-[#fff] hover:text-[#e1e1e1] text-xs xs:text-sm font-medium mb-2 block underline"
                                   >
                                     ver detalhes
                                   </button>
-                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-white block mb-2 xs:mb-0">
+                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-black block mb-2 xs:mb-0">
                                     R$ {item.price.toFixed(2)}
                                   </span>
                                 </div>
-                                <div className="flex items-center w-full xs:w-auto">
-                                  <button
-                                    onClick={() => addToCart(item)}
-                                    className="flex-1 xs:flex-none bg-black text-white px-2 xs:px-3 py-1.5 xs:py-2 rounded-lg hover:bg-gray-800 transition-all flex items-center justify-center xs:justify-start gap-1 xs:gap-2 text-xs xs:text-sm"
-                                  >
-                                    <ShoppingCart className="w-3 h-3 xs:w-4 xs:h-4" />
-                                    <Plus className="w-3 h-3 xs:w-4 xs:h-4" />
-                                  </button>
+                                <div className="flex items-center gap-2 w-full xs:w-auto">
+                                  {!itemQuantitySelector[item.id] ? (
+                                    <button
+                                      onClick={() =>
+                                        handleCartButtonClick(item.id)
+                                      }
+                                      className="flex-1 xs:flex-none bg-black text-white px-2 xs:px-3 py-1.5 xs:py-2 rounded-lg hover:bg-gray-800 transition-all flex items-center justify-center xs:justify-start gap-1 xs:gap-2 text-xs xs:text-sm"
+                                    >
+                                      <ShoppingCart className="w-3 h-3 xs:w-4 xs:h-4" />
+                                      <Plus className="w-3 h-3 xs:w-4 xs:h-4" />
+                                    </button>
+                                  ) : (
+                                    <>
+                                      <div className="flex items-center gap-0.5 sm:gap-1">
+                                        <button
+                                          onClick={() =>
+                                            decrementQuantity(item.id)
+                                          }
+                                          className="p-1.5 sm:p-2 hover:bg-gray-200 rounded transition"
+                                        >
+                                          <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        </button>
+                                        <span className="font-bold w-7 sm:w-8 text-center text-sm sm:text-base">
+                                          {itemQuantitySelector[item.id]}
+                                        </span>
+                                        <button
+                                          onClick={() =>
+                                            incrementQuantity(item.id)
+                                          }
+                                          className="p-1.5 sm:p-2 hover:bg-gray-200 rounded transition"
+                                        >
+                                          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        </button>
+                                      </div>
+                                      <button
+                                        onClick={() => confirmAddToCart(item)}
+                                        className="bg-black text-white px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg hover:bg-gray-800 transition-all flex items-center gap-1 text-xs"
+                                      >
+                                        <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                      </button>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
