@@ -38,7 +38,7 @@ export default function EmployeeLogin({
 
     if (!success) {
       setError(
-        "Não foi possível entrar. Verifique usuário e senha e tente novamente.",
+        "Usuário ou senha incorretos.",
       )
       setLoading(false)
     }
