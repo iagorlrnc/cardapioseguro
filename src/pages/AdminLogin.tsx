@@ -210,7 +210,7 @@ export default function AdminLogin({
                 <div className="text-center space-y-3">
                   <button
                     onClick={onSwitchToEmployee}
-                    className="block w-full text-sm text-white hover:text-[#0135d0] active:text-white focus:text-white transition-colors"
+                    className="block w-full text-sm text-white active:text-white focus:text-white transition-colors"
                   >
                     Acesso Funcionário{" "}
                     <span className="font-semibold">Login Funcionário</span>
@@ -218,7 +218,7 @@ export default function AdminLogin({
 
                   <button
                     onClick={onSwitchToLogin}
-                    className="text-sm text-white hover:text-[#0135d0] active:text-white focus:text-white transition-colors"
+                    className="text-sm text-white active:text-white focus:text-white transition-colors"
                   >
                     Voltar ao <span className="font-semibold">Login</span>
                   </button>
@@ -349,7 +349,7 @@ export default function AdminLogin({
               <div className="relative z-10 mt-6 text-center">
                 <button
                   onClick={() => setShowRegister(false)}
-                  className="text-sm text-white hover:text-[#0135d0] active:text-white transition-colors font-semibold"
+                  className="text-sm text-white active:text-white transition-colors font-semibold"
                 >
                   Voltar ao <span className="font-semibold">Login</span>
                 </button>
