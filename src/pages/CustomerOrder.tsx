@@ -671,7 +671,10 @@ export default function CustomerOrder() {
             alt="Bem-vindo"
             className="w-32 sm:h-20 md:h-24 object-cover rounded-full"
           />
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 text-center break-words px-4">
+          <h1
+            className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 text-center break-words px-4"
+            style={{ fontFamily: "'Verona TS Bold', serif" }}
+          >
             Bem-vindo
           </h1>
           <p className="text-base sm:text-lg text-white mb-6 sm:mb-8 text-center px-4">
