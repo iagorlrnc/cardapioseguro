@@ -149,7 +149,9 @@ export default function AdminLogin({
                     textShadow: "0 2px 6px rgba(0,0,0)",
                   }}
                 >
-                  Login<br/>Administrador
+                  Login
+                  <br />
+                  Administrador
                 </h1>
               </div>
 
@@ -208,7 +210,7 @@ export default function AdminLogin({
                 <div className="text-center space-y-3">
                   <button
                     onClick={onSwitchToEmployee}
-                    className="block w-full text-sm text-white hover:text-[#0135d0] active:text-white transition-colors"
+                    className="block w-full text-sm text-white hover:text-[#0135d0] active:text-white focus:text-white transition-colors"
                   >
                     Acesso Funcionário{" "}
                     <span className="font-semibold">Login Funcionário</span>
@@ -216,7 +218,7 @@ export default function AdminLogin({
 
                   <button
                     onClick={onSwitchToLogin}
-                    className="text-sm text-white hover:text-[#0135d0] active:text-white transition-colors"
+                    className="text-sm text-white hover:text-[#0135d0] active:text-white focus:text-white transition-colors"
                   >
                     Voltar ao <span className="font-semibold">Login</span>
                   </button>
