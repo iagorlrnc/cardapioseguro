@@ -40,9 +40,7 @@ export default function AdminLogin({
     const success = await login(username, password)
 
     if (!success) {
-      setError(
-        "Usuário ou senha incorretos.",
-      )
+      setError("Usuário ou senha incorretos.")
       setLoading(false)
     }
   }
@@ -138,12 +136,21 @@ export default function AdminLogin({
               <div className="relative z-10 mb-0 flex flex-col items-center">
                 <img
                   src="/assets/iconwhite.png"
-                  className="w-24 h-24 object-cover rounded-full mb-2"
+                  className="w-24 h-24 object-cover rounded-full mb-1"
                 />
-                <img
+                {/* <img
                   src="/assets/loginadminwhite.png"
                   className="w-[180px] object-contain mb-2"
-                />
+                /> */}
+                <h1
+                  className="text-[#c7e7e8] text-center text-4xl mb-6"
+                  style={{
+                    fontFamily: "'Verona TS Bold', serif",
+                    textShadow: "0 2px 6px rgba(0,0,0)",
+                  }}
+                >
+                  Login<br/>Administrador
+                </h1>
               </div>
 
               <form onSubmit={handleSubmit} className="relative z-10 space-y-4">
@@ -219,11 +226,20 @@ export default function AdminLogin({
           ) : (
             <>
               <div className="relative z-10 flex justify-center mb-6">
-                <img
+                {/* <img
                   src="/assets/cadastroadminwhite.png"
                   alt="Cadastro"
                   className="w-32 object-contain"
-                />
+                /> */}
+                <h1
+                  className="text-[#c7e7e8] text-center text-4xl"
+                  style={{
+                    fontFamily: "'Verona TS Bold', serif",
+                    textShadow: "0 2px 6px rgba(0,0,0)",
+                  }}
+                >
+                  Cadastro de Administrador
+                </h1>
               </div>
               <form
                 onSubmit={handleRegisterSubmit}

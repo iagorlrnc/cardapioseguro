@@ -116,12 +116,17 @@ export default function Login({
           <div className="relative z-10 mb-0 flex flex-col items-center">
             <img
               src="/assets/iconwhite.png"
-              className="w-24 h-24 object-cover rounded-full mb-2"
+              className="w-24 h-24 object-cover rounded-full mb-1"
             />
-            <img
-              src="/assets/cardapionovo.png"
-              className="w-40 object-contain mb-2"
-            />
+            <h1
+              className="text-[#c7e7e8] text-center text-4xl mb-6"
+              style={{
+                fontFamily: "'Verona TS Bold', serif",
+                textShadow: "0 2px 6px rgba(0,0,0)",
+              }}
+            >
+              Cardápio
+            </h1>
           </div>
           {error && (
             <div className="relative z-10 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
