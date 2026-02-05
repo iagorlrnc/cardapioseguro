@@ -10,7 +10,7 @@
   }
 
   body {
-    background-color: #000; /* Substitua pela cor do seu layout */
+    background-image: url("public/assets/bg.jpg");
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
