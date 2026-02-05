@@ -785,7 +785,7 @@ export default function CustomerOrder() {
                 <button
                   onClick={handleCallWaiter}
                   disabled={callingWaiter}
-                  className="flex items-center gap-2 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                  className="relative z-10 flex items-center gap-2 bg-gradient-to-r from-blue-800 to-blue-900 hover:from-blue-900 hover:to-blue-950 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                 >
                   <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
                   <span className="text-sm sm:text-base">
@@ -1014,7 +1014,7 @@ export default function CustomerOrder() {
                     return (
                       <div key={category} className="mb-6 sm:mb-8">
                         <h2
-                          className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 border-b pb-2 uppercase text-center"
+                          className="relative z-10 text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 border-b pb-2 uppercase text-center"
                           style={{
                             WebkitTextStroke: ".5px black",
                             fontFamily: "Economica, sans-serif",
