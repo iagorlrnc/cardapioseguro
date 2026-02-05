@@ -125,7 +125,7 @@ export default function EmployeeLogin({
   return (
     <div className="min-h-screen bg-[url('/assets/bg.jpg')] bg-cover bg-center flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="relative bg-cover rounded-lg shadow-2xl p-8 before:absolute before:inset-0 before:bg-black/70 before:rounded-lg before:z-0">
+        <div className="bg-black/20 backdrop-blur-sm rounded-lg shadow-2xl p-8 before:absolute before:inset-0 before:rounded-lg before:z-0">
           {!showRegister ? (
             <>
               <div className="relative z-10 mb-0 flex flex-col items-center">
@@ -194,7 +194,7 @@ export default function EmployeeLogin({
                 <div className="text-center space-y-3">
                   <button
                     onClick={onSwitchToAdmin}
-                    className="block w-full text-sm text-white hover:text-[#0135d0] transition"
+                    className="block w-full text-sm text-white hover:text-[#0135d0] active:text-white transition-colors"
                   >
                     Acesso Administrador{" "}
                     <span className="font-semibold">Login Administrador</span>
@@ -202,7 +202,7 @@ export default function EmployeeLogin({
 
                   <button
                     onClick={onSwitchToLogin}
-                    className="text-sm text-white hover:text-[#0135d0] transition"
+                    className="text-sm text-white hover:text-[#0135d0] active:text-white transition-colors"
                   >
                     Voltar ao <span className="font-semibold">Login</span>
                   </button>
@@ -304,7 +304,7 @@ export default function EmployeeLogin({
               <div className="relative z-10 mt-6 text-center">
                 <button
                   onClick={() => setShowRegister(false)}
-                  className="text-sm text-white hover:text-[#0135d0] transition font-semibold"
+                  className="text-sm text-white hover:text-[#0135d0] active:text-white transition-colors font-semibold"
                 >
                   Voltar ao <span className="font-semibold">Login</span>
                 </button>

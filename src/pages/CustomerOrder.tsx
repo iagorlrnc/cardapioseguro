@@ -676,10 +676,10 @@ export default function CustomerOrder() {
               </div>
 
               <div className="hidden sm:flex flex-col items-center flex-1">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-[#fff]">
                   Cardápio
                 </h1>
-                <p className="text-xs sm:text-sm text-white mt-0.5">
+                <p className="text-xs sm:text-sm text-[#fff] mt-0.5">
                   Mesa <span className="font-semibold">{user?.username}</span>
                 </p>
               </div>
@@ -748,7 +748,7 @@ export default function CustomerOrder() {
                 {/* Search and Filters */}
                 <div
                   ref={filterRef}
-                  className="bg-black/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
+                  className="relative z-50 bg-black/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
                 >
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4">
                     <div className="flex-1 relative">
@@ -794,7 +794,7 @@ export default function CustomerOrder() {
                       </button>
 
                       {isFilterOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-[1000]">
                           {[
                             "Todos",
                             ...categories.filter((cat) => cat !== "todos"),
@@ -844,7 +844,9 @@ export default function CustomerOrder() {
 
                   <div>
                     <div className="mb-4 sm:mb-6 md:hidden">
-                      {/* Mobile: Botão menor centralizado, tags abaixo */}
+                      className="relative z-0 bg-white/20 backdrop-blur-sm
+                      rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md
+                      transition-shadow"
                       <div className="flex justify-center mb-3 sm:mb-4">
                         <div className="relative w-full max-w-xs">
                           <button
@@ -869,7 +871,7 @@ export default function CustomerOrder() {
                           </button>
 
                           {isFilterOpen && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-[1000]">
                               {[
                                 "Todos",
                                 ...categories.filter((cat) => cat !== "todos"),
@@ -894,7 +896,6 @@ export default function CustomerOrder() {
                           )}
                         </div>
                       </div>
-
                       {/* Tags dos filtros selecionados - Mobile */}
                       {selectedCategories.length > 0 && (
                         <div className="flex flex-wrap justify-center gap-2">
@@ -991,7 +992,7 @@ export default function CustomerOrder() {
                                   </h3>
                                   <button
                                     onClick={() => openItemDetails(item)}
-                                    className="text-[#0000aa] hover:text-[#0000ff] text-xs xs:text-sm font-medium mb-2 block underline"
+                                    className="text-[#3b66ff] hover:text-[#0000fa] text-xs xs:text-sm font-medium mb-2 block underline"
                                   >
                                     ver detalhes
                                   </button>

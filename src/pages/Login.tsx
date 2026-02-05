@@ -112,7 +112,7 @@ export default function Login({
   return (
     <div className="min-h-screen bg-[url('/assets/bg.jpg')] bg-cover bg-center flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="relative bg-cover rounded-lg shadow-2xl p-8 before:absolute before:inset-0 before:bg-black/70 before:rounded-lg before:z-0">
+        <div className="bg-black/20 backdrop-blur-sm rounded-lg shadow-2xl p-8 before:absolute before:inset-0 before:rounded-lg before:z-0">
           <div className="relative z-10 mb-0 flex flex-col items-center">
             <img
               src="/assets/iconwhite.png"
