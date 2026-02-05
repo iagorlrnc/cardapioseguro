@@ -632,17 +632,14 @@ export default function CustomerOrder() {
           </p>
         </div>
       )}
-      {/* Fixed background image */}
       <div
-        className="fixed inset-0 bg-responsive -z-10"
+        className={`min-h-screen bg-responsive${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
         style={{
-          backgroundImage: `url('/assets/bgmenu3.jpg')`,
+          backgroundImage: `url('/assets/bg.jpg')`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
         }}
-      />
-      <div
-        className={`min-h-screen${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
       >
         {/* Header */}
         <header className="sticky top-0 left-0 right-0 z-40 bg-white shadow-md border-b safe-area-top">
@@ -975,16 +972,16 @@ export default function CustomerOrder() {
                           {items.map((item) => (
                             <div
                               key={item.id}
-                              className="relative bg-cover rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow before:absolute before:inset-0 before:bg-black/70 before:rounded-lg before:z-0"
+                              className="bg-white/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow"
                             >
-                              <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-3 sm:gap-4 relative z-10">
+                              <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-3 sm:gap-4">
                                 <img
                                   src={item.image_url}
                                   alt={item.name}
                                   className="w-16 h-16 xs:w-20 xs:h-20 object-cover rounded-lg flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0 w-full">
-                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2 text-white">
+                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2 text-black">
                                     {item.name}
                                   </h3>
                                   <button
@@ -993,7 +990,7 @@ export default function CustomerOrder() {
                                   >
                                     ver detalhes
                                   </button>
-                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-white block mb-2 xs:mb-0">
+                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-black block mb-2 xs:mb-0">
                                     R$ {item.price.toFixed(2)}
                                   </span>
                                 </div>
