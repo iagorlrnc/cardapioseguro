@@ -50,6 +50,7 @@ export default function CustomerOrder() {
   const [activeTab, setActiveTab] = useState<"menu" | "orders">("menu")
   const [showItemDetails, setShowItemDetails] = useState(false)
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
+  const [selectedItemQuantity, setSelectedItemQuantity] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState<string>("")
   const [observations, setObservations] = useState<string>("")
   const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -411,6 +412,7 @@ export default function CustomerOrder() {
 
   const openItemDetails = (item: MenuItem) => {
     setSelectedItem(item)
+    setSelectedItemQuantity(1)
     setShowItemDetails(true)
   }
 
@@ -1521,16 +1523,41 @@ export default function CustomerOrder() {
                     <span className="text-xl sm:text-2xl font-bold text-gray-900">
                       R$ {selectedItem.price.toFixed(2)}
                     </span>
-                    <button
-                      onClick={() => {
-                        addToCart(selectedItem)
-                        setShowItemDetails(false)
-                      }}
-                      className="w-full xs:w-auto bg-black text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-gray-800 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
-                    >
-                      <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
-                      Adicionar
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-0.5 sm:gap-1">
+                        <button
+                          onClick={() =>
+                            setSelectedItemQuantity(
+                              Math.max(1, selectedItemQuantity - 1),
+                            )
+                          }
+                          className="p-1.5 sm:p-2 hover:bg-gray-200 rounded transition"
+                        >
+                          <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                        <span className="font-bold w-7 sm:w-8 text-center text-sm sm:text-base">
+                          {selectedItemQuantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            setSelectedItemQuantity(selectedItemQuantity + 1)
+                          }
+                          className="p-1.5 sm:p-2 hover:bg-gray-200 rounded transition"
+                        >
+                          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => {
+                          addToCart(selectedItem, selectedItemQuantity)
+                          setShowItemDetails(false)
+                        }}
+                        className="bg-black text-white px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg hover:bg-gray-800 transition flex items-center justify-center gap-2 text-xs sm:text-sm"
+                      >
+                        <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        Adicionar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

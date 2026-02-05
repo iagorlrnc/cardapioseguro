@@ -1848,7 +1848,11 @@ export default function AdminDashboard() {
                     )
 
                   return orderedCategoryKeys.map((category) => {
-                    const items = groupedItems[category]
+                    const items = [...groupedItems[category]].sort((a, b) =>
+                      a.name.localeCompare(b.name, "pt-BR", {
+                        sensitivity: "base",
+                      }),
+                    )
                     return (
                       <div key={category} className="mb-6 sm:mb-8">
                         <h3 className="text-lg sm:text-xl font-bold text-black mb-3 sm:mb-4 border-b pb-2">
