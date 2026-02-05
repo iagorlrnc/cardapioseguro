@@ -115,7 +115,7 @@ export default function Login({
         <div className="relative bg-cover rounded-lg shadow-2xl p-8 before:absolute before:inset-0 before:bg-black/70 before:rounded-lg before:z-0">
           <div className="relative z-10 mb-0 flex flex-col items-center">
             <img
-              src="/assets/iconwhitepng.png"
+              src="/assets/iconwhite.png"
               className="w-24 h-24 object-cover rounded-full mb-2"
             />
             <img

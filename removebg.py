@@ -12,4 +12,4 @@ def remover_fundo(imagem_entrada, imagem_saida):
     resultado = cv2.merge(rgba, 4)
     cv2.imwrite(imagem_saida, resultado)
     print(f"Imagem salva em: {imagem_saida}")
-remover_fundo('loginadminverde.png', 'loginadminwhite.png')
+remover_fundo('whitelogo.jpg', 'whitelogo.png')

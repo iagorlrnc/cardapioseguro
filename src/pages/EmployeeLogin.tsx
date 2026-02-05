@@ -130,12 +130,12 @@ export default function EmployeeLogin({
             <>
               <div className="relative z-10 mb-0 flex flex-col items-center">
                 <img
-                  src="/assets/iconwhitepng.png"
+                  src="/assets/iconwhite.png"
                   className="w-24 h-24 object-cover rounded-full mb-2"
                 />
                 <img
                   src="/assets/loginfuncionariowhite.png"
-                  className="w-32 object-contain mb-2"
+                  className="w-[145px] object-contain mb-2"
                 />
               </div>
 
