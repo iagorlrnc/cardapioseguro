@@ -645,7 +645,7 @@ export default function CustomerOrder() {
         className={`min-h-screen${showWelcome ? " pointer-events-none select-none blur-sm" : ""}`}
       >
         {/* Header */}
-        <header className="sticky top-0 left-0 right-0 z-40 bg-white shadow-md border-b safe-area-top">
+        <header className="sticky top-0 left-0 right-0 z-40 bg-black/20 backdrop-blur-sm shadow-md safe-area-top">
           <div className="w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
             <div className="flex items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-0">
               <div className="flex items-center gap-1 sm:gap-4">
@@ -654,30 +654,32 @@ export default function CustomerOrder() {
                   className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition duration-200 ${
                     activeTab === "menu"
                       ? "bg-black text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+                      : "text-white hover:bg-white hover:text-black"
                   }`}
                 >
-                  <BookOpenCheck className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="hidden xs:inline">Cardápio</span>
+                  <BookOpenCheck className="w-4 h-4 sm:w-5 sm:h-5 text-current" />
+                  <span className="hidden xs:inline text-current">
+                    Cardápio
+                  </span>
                 </button>
                 <button
                   onClick={handleViewOrders}
                   className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition duration-200 ${
                     activeTab === "orders"
                       ? "bg-black text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+                      : "text-white hover:bg-white hover:text-black"
                   }`}
                 >
-                  <History className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="hidden xs:inline">Pedidos</span>
+                  <History className="w-4 h-4 sm:w-5 sm:h-5 text-current" />
+                  <span className="hidden xs:inline text-current">Pedidos</span>
                 </button>
               </div>
 
               <div className="hidden sm:flex flex-col items-center flex-1">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                   Cardápio
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
+                <p className="text-xs sm:text-sm text-white mt-0.5">
                   Mesa <span className="font-semibold">{user?.username}</span>
                 </p>
               </div>
@@ -688,13 +690,13 @@ export default function CustomerOrder() {
                   className="p-2 sm:p-2.5 md:p-3 hover:bg-gray-100 rounded-lg transition duration-200"
                   title="QR Code da Mesa"
                 >
-                  <Share2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
+                  <Share2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white hover:text-black" />
                 </button>
                 <button
                   onClick={() => setShowCart(true)}
                   className="relative p-2 sm:p-2.5 md:p-3 hover:bg-gray-100 rounded-lg transition duration-200"
                 >
-                  <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
+                  <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white hover:text-black" />
                   {cart.length > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center font-bold">
                       {cart.reduce((sum, item) => sum + item.quantity, 0)}
@@ -709,7 +711,7 @@ export default function CustomerOrder() {
                   className="p-2 sm:p-2.5 md:p-3 hover:bg-gray-100 rounded-lg transition duration-200"
                   title="Sair"
                 >
-                  <LogOut className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
+                  <LogOut className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white hover:text-black" />
                 </button>
               </div>
             </div>
@@ -746,7 +748,7 @@ export default function CustomerOrder() {
                 {/* Search and Filters */}
                 <div
                   ref={filterRef}
-                  className="bg-white/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
+                  className="bg-black/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6"
                 >
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-4">
                     <div className="flex-1 relative">
@@ -975,7 +977,7 @@ export default function CustomerOrder() {
                           {items.map((item) => (
                             <div
                               key={item.id}
-                              className="bg-white/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow"
+                              className="bg-black/20 backdrop-blur-sm rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow"
                             >
                               <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-3 sm:gap-4">
                                 <img
@@ -984,16 +986,16 @@ export default function CustomerOrder() {
                                   className="w-16 h-16 xs:w-20 xs:h-20 object-cover rounded-lg flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0 w-full">
-                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2 text-black">
+                                  <h3 className="font-bold text-sm xs:text-base sm:text-lg mb-1 line-clamp-2 text-white">
                                     {item.name}
                                   </h3>
                                   <button
                                     onClick={() => openItemDetails(item)}
-                                    className="text-blue-400 hover:text-blue-300 text-xs xs:text-sm font-medium mb-2 block underline"
+                                    className="text-[#0000aa] hover:text-[#0000ff] text-xs xs:text-sm font-medium mb-2 block underline"
                                   >
                                     ver detalhes
                                   </button>
-                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-black block mb-2 xs:mb-0">
+                                  <span className="text-base xs:text-lg sm:text-xl font-bold text-white block mb-2 xs:mb-0">
                                     R$ {item.price.toFixed(2)}
                                   </span>
                                 </div>
@@ -1172,8 +1174,8 @@ export default function CustomerOrder() {
                 </div>
               ) : (
                 <div className="text-center py-8 sm:py-12">
-                  <History className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-gray-300 mb-3 sm:mb-4" />
-                  <p className="text-gray-500 text-base sm:text-lg mb-3 sm:mb-4">
+                  <History className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-white mb-3 sm:mb-4" />
+                  <p className="text-white text-base sm:text-lg mb-3 sm:mb-4">
                     Você ainda não fez nenhum pedido.
                   </p>
                   <button
